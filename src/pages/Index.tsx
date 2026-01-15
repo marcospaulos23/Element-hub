@@ -1,106 +1,139 @@
 import { useState, useMemo } from "react";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/AppSidebar";
 import Hero from "@/components/Hero";
 import ElementCard from "@/components/ElementCard";
-import CategoryFilter from "@/components/CategoryFilter";
 import CodeModal from "@/components/CodeModal";
-import { elements, UIElement } from "@/data/elements";
+import AddElementModal from "@/components/AddElementModal";
+import { elements as initialElements, UIElement } from "@/data/elements";
+import { Menu } from "lucide-react";
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [selectedElement, setSelectedElement] = useState<UIElement | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [elements, setElements] = useState<UIElement[]>(initialElements);
 
   const filteredElements = useMemo(() => {
     if (activeCategory === "Todos") return elements;
     return elements.filter((el) => el.category === activeCategory);
-  }, [activeCategory]);
+  }, [activeCategory, elements]);
 
   const handleElementClick = (element: UIElement) => {
     setSelectedElement(element);
-    setIsModalOpen(true);
+    setIsCodeModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseCodeModal = () => {
+    setIsCodeModalOpen(false);
     setTimeout(() => setSelectedElement(null), 200);
   };
 
+  const handleAddElement = (newElement: Omit<UIElement, "id">) => {
+    const element: UIElement = {
+      ...newElement,
+      id: String(Date.now()),
+    };
+    setElements((prev) => [element, ...prev]);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">UI</span>
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen flex w-full bg-background">
+        {/* Sidebar */}
+        <AppSidebar
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
+          onAddElement={() => setIsAddModalOpen(true)}
+        />
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header */}
+          <header className="sticky top-0 z-40 glass border-b border-border">
+            <div className="flex items-center gap-4 px-4 py-3">
+              <SidebarTrigger className="md:hidden">
+                <Menu className="h-5 w-5" />
+              </SidebarTrigger>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-foreground">UI Elements</span>
+                <span className="text-muted-foreground hidden sm:inline">Repository</span>
+              </div>
             </div>
-            <span className="font-semibold text-foreground">Elements</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#elements" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Elementos
-            </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Sobre
-            </a>
-          </nav>
-        </div>
-      </header>
+          </header>
 
-      {/* Main Content */}
-      <main className="pt-20">
-        <Hero />
+          {/* Main Content Area */}
+          <main className="flex-1 overflow-auto">
+            <Hero />
 
-        {/* Elements Section */}
-        <section id="elements" className="py-16 px-4">
-          <div className="container mx-auto max-w-7xl">
-            {/* Category Filter */}
-            <div className="mb-12">
-              <CategoryFilter
-                activeCategory={activeCategory}
-                onCategoryChange={setActiveCategory}
-              />
-            </div>
+            {/* Elements Section */}
+            <section id="elements" className="py-12 px-4 md:px-8">
+              <div className="max-w-7xl mx-auto">
+                {/* Section Header */}
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      {activeCategory === "Todos" ? "Todos os Elementos" : activeCategory}
+                    </h2>
+                    <p className="text-muted-foreground mt-1">
+                      {filteredElements.length} elemento{filteredElements.length !== 1 ? "s" : ""} encontrado{filteredElements.length !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                </div>
 
-            {/* Elements Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredElements.map((element) => (
-                <ElementCard
-                  key={element.id}
-                  element={element}
-                  onClick={() => handleElementClick(element)}
-                />
-              ))}
-            </div>
+                {/* Elements Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filteredElements.map((element, index) => (
+                    <ElementCard
+                      key={element.id}
+                      element={element}
+                      onClick={() => handleElementClick(element)}
+                    />
+                  ))}
+                </div>
 
-            {/* Empty State */}
-            {filteredElements.length === 0 && (
-              <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">
-                  Nenhum elemento encontrado nesta categoria.
+                {/* Empty State */}
+                {filteredElements.length === 0 && (
+                  <div className="text-center py-20 px-4">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                      <span className="text-2xl">🔍</span>
+                    </div>
+                    <p className="text-muted-foreground text-lg mb-2">
+                      Nenhum elemento encontrado
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      Tente selecionar outra categoria ou adicione um novo elemento
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="border-t border-border py-8 px-4 mt-8">
+              <div className="max-w-7xl mx-auto text-center">
+                <p className="text-sm text-muted-foreground">
+                  © 2025 UI Elements Repository. Feito com ❤️ para desenvolvedores.
                 </p>
               </div>
-            )}
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border py-8 px-4">
-        <div className="container mx-auto text-center">
-          <p className="text-sm text-muted-foreground">
-            © 2025 UI Elements Repository. Feito com ❤️ para desenvolvedores.
-          </p>
+            </footer>
+          </main>
         </div>
-      </footer>
 
-      {/* Code Modal */}
-      <CodeModal
-        element={selectedElement}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      />
-    </div>
+        {/* Modals */}
+        <CodeModal
+          element={selectedElement}
+          isOpen={isCodeModalOpen}
+          onClose={handleCloseCodeModal}
+        />
+        <AddElementModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onAdd={handleAddElement}
+        />
+      </div>
+    </SidebarProvider>
   );
 };
 
