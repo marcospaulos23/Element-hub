@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Plus, LayoutGrid, MousePointer2, CreditCard, FormInput, Loader2, Sparkles, Home, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, BookOpen, Settings, HelpCircle, Plus, PanelLeft, Sparkles } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,43 +10,44 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
+  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const categoryIcons: Record<string, React.ElementType> = {
-  "Todos": LayoutGrid,
-  "Botões": MousePointer2,
-  "Cards": CreditCard,
-  "Forms": FormInput,
-  "Loaders": Loader2,
-  "UI": Sparkles,
-};
-
 interface AppSidebarProps {
-  activeCategory: string;
-  onCategoryChange: (category: string) => void;
   onAddElement: () => void;
 }
 
-const AppSidebar = ({ activeCategory, onCategoryChange, onAddElement }: AppSidebarProps) => {
+const AppSidebar = ({ onAddElement }: AppSidebarProps) => {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
 
-  const categories = ["Todos", "Botões", "Cards", "Forms", "Loaders", "UI"];
+  const mainNavItems = [
+    { title: "Início", icon: Home, href: "#" },
+    { title: "Como Utilizar", icon: BookOpen, href: "#guide" },
+    { title: "Novidades", icon: Sparkles, href: "#news" },
+  ];
+
+  const secondaryNavItems = [
+    { title: "Configurações", icon: Settings, href: "#settings" },
+    { title: "Ajuda", icon: HelpCircle, href: "#help" },
+  ];
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <span className="text-primary-foreground font-bold text-sm">UI</span>
-          </div>
+      <SidebarHeader className="p-3">
+        {/* Collapse Button - Top */}
+        <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <div className="flex flex-col">
-              <span className="font-semibold text-foreground text-sm">UI Elements</span>
-              <span className="text-xs text-muted-foreground">Repository</span>
-            </div>
+            <span className="font-semibold text-foreground text-lg">Element Hub</span>
           )}
+          <SidebarMenuButton
+            onClick={toggleSidebar}
+            tooltip={isCollapsed ? "Expandir" : "Recolher"}
+            className="h-8 w-8 p-0 flex items-center justify-center hover:bg-muted"
+          >
+            <PanelLeft className="h-5 w-5" />
+          </SidebarMenuButton>
         </div>
       </SidebarHeader>
 
@@ -70,49 +70,61 @@ const AppSidebar = ({ activeCategory, onCategoryChange, onAddElement }: AppSideb
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Categories */}
+        <SidebarSeparator />
+
+        {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel>Categorias</SidebarGroupLabel>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {categories.map((category) => {
-                const Icon = categoryIcons[category] || LayoutGrid;
-                const isActive = activeCategory === category;
-                
-                return (
-                  <SidebarMenuItem key={category}>
-                    <SidebarMenuButton
-                      onClick={() => onCategoryChange(category)}
-                      isActive={isActive}
-                      tooltip={category}
-                      className={isActive ? "bg-primary/20 text-primary" : ""}
-                    >
-                      <Icon className="h-4 w-4" />
-                      {!isCollapsed && <span>{category}</span>}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              {mainNavItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.title}
+                  >
+                    <a href={item.href}>
+                      <item.icon className="h-4 w-4" />
+                      {!isCollapsed && <span>{item.title}</span>}
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        {/* Secondary Navigation */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Outros</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {secondaryNavItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.title}
+                  >
+                    <a href={item.href}>
+                      <item.icon className="h-4 w-4" />
+                      {!isCollapsed && <span>{item.title}</span>}
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-2">
-        <SidebarMenuButton
-          onClick={toggleSidebar}
-          tooltip={isCollapsed ? "Expandir" : "Recolher"}
-          className="w-full justify-center"
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <>
-              <ChevronLeft className="h-4 w-4" />
-              <span>Recolher</span>
-            </>
-          )}
-        </SidebarMenuButton>
+      <SidebarFooter className="p-3">
+        {!isCollapsed && (
+          <div className="text-xs text-muted-foreground text-center">
+            <p>Element Hub v1.0</p>
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

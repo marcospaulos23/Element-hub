@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
 import Hero from "@/components/Hero";
 import ElementCard from "@/components/ElementCard";
+import CategoryFilter from "@/components/CategoryFilter";
 import CodeModal from "@/components/CodeModal";
 import AddElementModal from "@/components/AddElementModal";
 import { elements as initialElements, UIElement } from "@/data/elements";
@@ -42,11 +43,7 @@ const Index = () => {
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         {/* Sidebar */}
-        <AppSidebar
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-          onAddElement={() => setIsAddModalOpen(true)}
-        />
+        <AppSidebar onAddElement={() => setIsAddModalOpen(true)} />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
@@ -57,8 +54,7 @@ const Index = () => {
                 <Menu className="h-5 w-5" />
               </SidebarTrigger>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-foreground">UI Elements</span>
-                <span className="text-muted-foreground hidden sm:inline">Repository</span>
+                <span className="font-semibold text-foreground">Element Hub</span>
               </div>
             </div>
           </header>
@@ -70,6 +66,14 @@ const Index = () => {
             {/* Elements Section */}
             <section id="elements" className="py-12 px-4 md:px-8">
               <div className="max-w-7xl mx-auto">
+                {/* Category Filter */}
+                <div className="mb-10">
+                  <CategoryFilter
+                    activeCategory={activeCategory}
+                    onCategoryChange={setActiveCategory}
+                  />
+                </div>
+
                 {/* Section Header */}
                 <div className="flex items-center justify-between mb-8">
                   <div>
@@ -84,7 +88,7 @@ const Index = () => {
 
                 {/* Elements Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredElements.map((element, index) => (
+                  {filteredElements.map((element) => (
                     <ElementCard
                       key={element.id}
                       element={element}
@@ -114,7 +118,7 @@ const Index = () => {
             <footer className="border-t border-border py-8 px-4 mt-8">
               <div className="max-w-7xl mx-auto text-center">
                 <p className="text-sm text-muted-foreground">
-                  © 2025 UI Elements Repository. Feito com ❤️ para desenvolvedores.
+                  © 2025 Element Hub. Feito com ❤️ para desenvolvedores.
                 </p>
               </div>
             </footer>
