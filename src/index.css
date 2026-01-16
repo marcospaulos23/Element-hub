@@ -6,47 +6,45 @@
 
 @layer base {
   :root {
-    --background: 220 20% 6%;
-    --foreground: 210 20% 98%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
 
-    --card: 220 20% 10%;
-    --card-foreground: 210 20% 98%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 220 20% 8%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 175 80% 50%;
-    --primary-foreground: 220 20% 6%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 4%;
 
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 210 20% 90%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 220 15% 18%;
-    --muted-foreground: 215 15% 55%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 50%;
 
-    --accent: 175 60% 40%;
-    --accent-foreground: 210 20% 98%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 175 80% 50%;
+    --border: 0 0% 16%;
+    --input: 0 0% 14%;
+    --ring: 0 0% 40%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --glow-primary: 175 80% 50%;
-    --gradient-start: 175 80% 50%;
-    --gradient-end: 200 80% 60%;
-    --card-hover: 220 20% 14%;
-    --code-bg: 220 20% 8%;
+    --glow-color: 0 0% 100%;
+    --card-hover: 0 0% 12%;
+    --code-bg: 0 0% 6%;
   }
 
   .dark {
-    --background: 220 20% 6%;
-    --foreground: 210 20% 98%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
   }
 }
 
@@ -67,21 +65,21 @@
 
 @layer utilities {
   .gradient-text {
-    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+    @apply text-foreground;
   }
 
   .glow-effect {
-    box-shadow: 0 0 40px -10px hsl(var(--primary) / 0.4);
+    box-shadow: 0 0 40px -10px hsl(var(--glow-color) / 0.15);
   }
 
   .card-glow {
-    box-shadow: 0 0 0 1px hsl(var(--border)), 
-                0 4px 20px -4px hsl(var(--primary) / 0.15);
+    box-shadow: 0 0 0 1px hsl(var(--border));
   }
 
   .card-glow-hover {
-    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.5), 
-                0 8px 40px -8px hsl(var(--primary) / 0.3);
+    box-shadow: 0 0 0 1px hsl(var(--glow-color) / 0.2), 
+                0 0 60px -15px hsl(var(--glow-color) / 0.15),
+                0 0 30px -10px hsl(var(--glow-color) / 0.1);
   }
 
   .glass {
