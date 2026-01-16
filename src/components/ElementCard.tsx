@@ -41,10 +41,10 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
             {element.category}
           </span>
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-base font-semibold text-foreground mb-1.5 tracking-tight">
           {element.name}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-2">
+        <p className="text-sm text-muted-foreground font-light leading-relaxed line-clamp-2">
           {element.description}
         </p>
       </div>
