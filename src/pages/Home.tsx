@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 const Home = () => {
   return (
     <div className="min-h-screen bg-background flex items-center">
-      <div className="w-full max-w-7xl mx-auto px-8 md:px-16 lg:px-24">
-        <div className="max-w-2xl">
+      <div className="w-full px-6 md:px-12 lg:px-16">
+        <div className="max-w-xl">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6">
             Element Hub
           </h1>
