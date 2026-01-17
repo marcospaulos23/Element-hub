@@ -9,9 +9,17 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="group relative bg-card rounded-xl overflow-hidden cursor-pointer transition-all duration-500 card-glow hover:card-glow-hover animate-fade-in border border-border hover:border-muted-foreground/30"
+      className="group relative bg-card rounded-xl overflow-hidden cursor-pointer transition-all duration-300 border border-border hover:border-primary/50 animate-fade-in"
       style={{ animationDelay: `${parseInt(element.id) * 100}ms` }}
     >
+      {/* Gradient glow effect on hover */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 0%, hsl(0 0% 100% / 0.08) 0%, transparent 60%)'
+        }}
+      />
+
       {/* Video Preview */}
       <div className="relative aspect-video overflow-hidden bg-muted/30">
         <video
@@ -37,24 +45,17 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       {/* Info */}
       <div className="p-5">
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-medium px-3 py-1 rounded-full bg-muted text-muted-foreground border border-border">
+          <span className="text-xs font-medium px-3 py-1 rounded-full bg-muted text-muted-foreground border border-border font-['Space_Grotesk']">
             {element.category}
           </span>
         </div>
-        <h3 className="text-base font-semibold text-foreground mb-1.5 tracking-tight">
+        <h3 className="text-base font-semibold text-foreground mb-1.5 tracking-tight font-['Space_Grotesk']">
           {element.name}
         </h3>
-        <p className="text-sm text-muted-foreground font-light leading-relaxed line-clamp-2">
+        <p className="text-sm text-muted-foreground font-normal leading-relaxed line-clamp-2 font-['Space_Grotesk']">
           {element.description}
         </p>
       </div>
-
-      {/* Glow effect on hover */}
-      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{
-          boxShadow: '0 0 80px -20px rgba(255, 255, 255, 0.15), inset 0 0 60px -30px rgba(255, 255, 255, 0.05)'
-        }}
-      />
     </div>
   );
 };
