@@ -39,6 +39,10 @@ const Index = () => {
     setElements((prev) => [element, ...prev]);
   };
 
+  const handleDeleteElement = (id: string) => {
+    setElements((prev) => prev.filter((el) => el.id !== id));
+  };
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
@@ -69,6 +73,7 @@ const Index = () => {
                       key={element.id}
                       element={element}
                       onClick={() => handleElementClick(element)}
+                      onDelete={handleDeleteElement}
                     />
                   ))}
                 </div>
