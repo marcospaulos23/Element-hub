@@ -6,16 +6,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import { UIElement, categories } from "@/data/elements";
+import { UIElement } from "@/data/elements";
 import CodePreview from "./CodePreview";
 
 interface AddElementModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (element: Omit<UIElement, "id">) => void;
+  categories: string[];
 }
 
-const AddElementModal = ({ isOpen, onClose, onAdd }: AddElementModalProps) => {
+const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModalProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -112,7 +113,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd }: AddElementModalProps) => {
                   id="code"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="<button className='...'>Meu Botão</button>"
+                  placeholder="<button class='...'>Meu Botão</button>"
                   className="bg-secondary border-border focus:border-primary font-mono text-sm min-h-[180px]"
                   required
                 />
