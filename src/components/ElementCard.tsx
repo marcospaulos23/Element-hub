@@ -1,19 +1,12 @@
-import { Trash2 } from "lucide-react";
 import { UIElement } from "@/data/elements";
 import CodePreview from "./CodePreview";
 
 interface ElementCardProps {
   element: UIElement;
   onClick: () => void;
-  onDelete: (id: string) => void;
 }
 
-const ElementCard = ({ element, onClick, onDelete }: ElementCardProps) => {
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete(element.id);
-  };
-
+const ElementCard = ({ element, onClick }: ElementCardProps) => {
   return (
     <div
       onClick={onClick}
@@ -28,21 +21,12 @@ const ElementCard = ({ element, onClick, onDelete }: ElementCardProps) => {
         }}
       />
 
-      {/* Delete Button */}
-      <button
-        onClick={handleDelete}
-        className="absolute top-3 right-3 z-20 p-2 rounded-lg bg-destructive/80 hover:bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        title="Excluir elemento"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
-
       {/* Code Preview */}
       <div className="relative aspect-video overflow-hidden bg-muted/30">
         <CodePreview code={element.code} className="w-full h-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
         
-        {/* Play overlay */}
+        {/* Code overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           <div className="w-14 h-14 rounded-full bg-foreground/90 flex items-center justify-center backdrop-blur-sm">
             <svg className="w-6 h-6 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -6,15 +6,19 @@ import ElementCard from "@/components/ElementCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import CodeModal from "@/components/CodeModal";
 import AddElementModal from "@/components/AddElementModal";
-import { elements as initialElements, UIElement } from "@/data/elements";
-
+import AddCategoryModal from "@/components/AddCategoryModal";
+import { elements as initialElements, categories as initialCategories, UIElement } from "@/data/elements";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [selectedElement, setSelectedElement] = useState<UIElement | null>(null);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [elements, setElements] = useState<UIElement[]>(initialElements);
+  const [categories, setCategories] = useState<string[]>(initialCategories);
 
   const filteredElements = useMemo(() => {
     if (activeCategory === "Todos") return elements;
@@ -39,18 +43,33 @@ const Index = () => {
     setElements((prev) => [element, ...prev]);
   };
 
-  const handleDeleteElement = (id: string) => {
-    setElements((prev) => prev.filter((el) => el.id !== id));
+  const handleAddCategory = (categoryName: string) => {
+    if (!categories.includes(categoryName)) {
+      setCategories((prev) => [...prev, categoryName]);
+    }
   };
 
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         {/* Sidebar */}
-        <AppSidebar onAddElement={() => setIsAddModalOpen(true)} />
+        <AppSidebar onAddCategory={() => setIsAddCategoryModalOpen(true)} />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
+          {/* Top Header with Add Element Button */}
+          <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
+            <div className="flex items-center justify-end px-4 py-3">
+              <Button
+                onClick={() => setIsAddModalOpen(true)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Elemento
+              </Button>
+            </div>
+          </header>
+
           {/* Main Content Area */}
           <main className="flex-1 overflow-auto">
             <Hero />
@@ -61,6 +80,7 @@ const Index = () => {
                 {/* Category Filter */}
                 <div className="mb-10">
                   <CategoryFilter
+                    categories={categories}
                     activeCategory={activeCategory}
                     onCategoryChange={setActiveCategory}
                   />
@@ -73,7 +93,6 @@ const Index = () => {
                       key={element.id}
                       element={element}
                       onClick={() => handleElementClick(element)}
-                      onDelete={handleDeleteElement}
                     />
                   ))}
                 </div>
@@ -108,6 +127,12 @@ const Index = () => {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onAdd={handleAddElement}
+          categories={categories}
+        />
+        <AddCategoryModal
+          isOpen={isAddCategoryModalOpen}
+          onClose={() => setIsAddCategoryModalOpen(false)}
+          onAdd={handleAddCategory}
         />
       </div>
     </SidebarProvider>

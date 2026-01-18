@@ -1,4 +1,4 @@
-import { Home, BookOpen, Settings, HelpCircle, Plus, PanelLeft, Sparkles } from "lucide-react";
+import { Home, BookOpen, Settings, HelpCircle, Plus, PanelLeft, Sparkles, FolderPlus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,10 +15,10 @@ import {
 } from "@/components/ui/sidebar";
 
 interface AppSidebarProps {
-  onAddElement: () => void;
+  onAddCategory: () => void;
 }
 
-const AppSidebar = ({ onAddElement }: AppSidebarProps) => {
+const AppSidebar = ({ onAddCategory }: AppSidebarProps) => {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
 
@@ -52,18 +52,18 @@ const AppSidebar = ({ onAddElement }: AppSidebarProps) => {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Add Element Button */}
+        {/* Add Category Button */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  onClick={onAddElement}
-                  tooltip="Adicionar Elemento"
+                  onClick={onAddCategory}
+                  tooltip="Adicionar Categoria"
                   className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
                 >
-                  <Plus className="h-4 w-4" />
-                  {!isCollapsed && <span>Adicionar Elemento</span>}
+                  <FolderPlus className="h-4 w-4" />
+                  {!isCollapsed && <span>Adicionar Categoria</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

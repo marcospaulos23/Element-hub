@@ -1,11 +1,10 @@
-import { categories } from "@/data/elements";
-
 interface CategoryFilterProps {
+  categories: string[];
   activeCategory: string;
   onCategoryChange: (category: string) => void;
 }
 
-const CategoryFilter = ({ activeCategory, onCategoryChange }: CategoryFilterProps) => {
+const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: CategoryFilterProps) => {
   return (
     <div className="flex flex-wrap gap-2 justify-center">
       {categories.map((category) => (
