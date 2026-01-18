@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { UIElement } from "@/data/elements";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, Copy, X } from "lucide-react";
+import { Check, Copy } from "lucide-react";
+import CodePreview from "./CodePreview";
 
 interface CodeModalProps {
   element: UIElement | null;
@@ -36,17 +37,10 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
           </div>
         </DialogHeader>
 
-        {/* Video Preview */}
+        {/* Live Preview */}
         <div className="px-6">
           <div className="relative aspect-video rounded-lg overflow-hidden border border-border">
-            <video
-              src={element.videoUrl}
-              className="w-full h-full object-cover"
-              autoPlay
-              loop
-              muted
-              playsInline
-            />
+            <CodePreview code={element.code} className="w-full h-full" />
           </div>
         </div>
 

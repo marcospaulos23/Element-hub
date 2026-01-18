@@ -1,11 +1,19 @@
+import { Trash2 } from "lucide-react";
 import { UIElement } from "@/data/elements";
+import CodePreview from "./CodePreview";
 
 interface ElementCardProps {
   element: UIElement;
   onClick: () => void;
+  onDelete: (id: string) => void;
 }
 
-const ElementCard = ({ element, onClick }: ElementCardProps) => {
+const ElementCard = ({ element, onClick, onDelete }: ElementCardProps) => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(element.id);
+  };
+
   return (
     <div
       onClick={onClick}
@@ -14,29 +22,31 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
     >
       {/* Gradient glow effect on hover */}
       <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl"
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl z-10"
         style={{
           background: 'radial-gradient(ellipse at 50% 0%, hsl(0 0% 100% / 0.08) 0%, transparent 60%)'
         }}
       />
 
-      {/* Video Preview */}
+      {/* Delete Button */}
+      <button
+        onClick={handleDelete}
+        className="absolute top-3 right-3 z-20 p-2 rounded-lg bg-destructive/80 hover:bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        title="Excluir elemento"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+
+      {/* Code Preview */}
       <div className="relative aspect-video overflow-hidden bg-muted/30">
-        <video
-          src={element.videoUrl}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40" />
+        <CodePreview code={element.code} className="w-full h-full" />
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
         
         {/* Play overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           <div className="w-14 h-14 rounded-full bg-foreground/90 flex items-center justify-center backdrop-blur-sm">
-            <svg className="w-6 h-6 text-background ml-1" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
+            <svg className="w-6 h-6 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           </div>
         </div>
