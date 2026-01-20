@@ -64,7 +64,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl bg-popover border-border max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl bg-popover border-border max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-600 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary" />
