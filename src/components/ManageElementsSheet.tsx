@@ -106,9 +106,11 @@ const ManageElementsSheet = ({
                     </p>
                   </div>
 
-                  {/* Element Preview */}
-                  <div className="w-16 h-12 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0">
-                    <CodePreview code={element.code} className="w-full h-full scale-50 origin-center" />
+                  {/* Element Preview - Static thumbnail */}
+                  <div className="w-14 h-10 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0 flex items-center justify-center">
+                    <div className="w-[140px] h-[100px] transform scale-[0.1] origin-center">
+                      <CodePreview code={element.code} className="w-full h-full !border-0" />
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-1 ml-3">
