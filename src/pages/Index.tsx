@@ -79,7 +79,7 @@ const Index = () => {
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top Header with Add Element Button */}
-          <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
+          <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm">
             <div className="flex items-center justify-end px-4 py-3">
               <Button
                 onClick={() => setIsAddModalOpen(true)}
