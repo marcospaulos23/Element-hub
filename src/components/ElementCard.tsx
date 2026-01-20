@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 
@@ -39,14 +39,16 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
 
       {/* Code Preview / Image */}
       <div className="relative aspect-video overflow-hidden bg-muted/30">
-        {hasPreviewImage && !isHovered ? (
+        {/* Always render CodePreview but hide it when showing preview image */}
+        <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
+          <CodePreview code={element.code} className="w-full h-full" />
+        </div>
+        {hasPreviewImage && (
           <img
             src={element.preview_image!}
             alt={element.name}
-            className="w-full h-full object-cover transition-opacity duration-300"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? "opacity-0 pointer-events-none" : "opacity-100"}`}
           />
-        ) : (
-          <CodePreview code={element.code} className="w-full h-full" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
       </div>
@@ -74,4 +76,4 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   );
 };
 
-export default ElementCard;
+export default memo(ElementCard);
