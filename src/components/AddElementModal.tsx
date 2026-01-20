@@ -64,8 +64,8 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl bg-popover border-border h-[85vh] flex flex-col overflow-hidden">
-        <DialogHeader className="flex-shrink-0">
+      <DialogContent className="max-w-4xl bg-popover border-border max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
           <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary" />
             Adicionar Elemento
@@ -75,53 +75,73 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0">
+        <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Left Column - Form Fields */}
-            <div className="flex flex-col gap-3 min-h-0">
+            <div className="space-y-5">
               {/* Name */}
-              <div className="space-y-1 flex-shrink-0">
-                <Label htmlFor="name" className="text-foreground text-sm">Título</Label>
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-foreground">Título</Label>
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ex: Botão Gradient"
-                  className="bg-secondary border-border focus:border-primary h-9"
+                  className="bg-secondary border-border focus:border-primary"
                   required
                 />
               </div>
 
               {/* Description */}
-              <div className="space-y-1 flex-shrink-0">
-                <Label htmlFor="description" className="text-foreground text-sm">Descrição</Label>
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-foreground">Descrição</Label>
                 <Input
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Descreva o elemento..."
-                  className="bg-secondary border-border focus:border-primary h-9"
+                  className="bg-secondary border-border focus:border-primary"
                   required
                 />
               </div>
 
               {/* Categories - Multiple Selection */}
-              <div className="space-y-1 flex-shrink-0">
-                <Label className="text-foreground text-sm">Categorias</Label>
+              <div className="space-y-3">
+                <Label className="text-foreground">Categorias</Label>
                 
-                {/* Category Checkboxes - Grid layout */}
-                <div className="grid grid-cols-2 gap-1.5 p-2 bg-secondary/50 rounded-lg border border-border">
+                {/* Selected Categories Tags */}
+                {selectedCategories.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {selectedCategories.map((cat) => (
+                      <span
+                        key={cat}
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-medium"
+                      >
+                        {cat}
+                        <button
+                          type="button"
+                          onClick={() => removeCategory(cat)}
+                          className="hover:bg-primary/30 rounded-full p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Category Checkboxes */}
+                <div className="grid grid-cols-2 gap-2 p-3 bg-secondary/50 rounded-lg border border-border max-h-[150px] overflow-y-auto">
                   {filteredCategories.map((cat) => (
                     <div key={cat} className="flex items-center space-x-2">
                       <Checkbox
                         id={`cat-${cat}`}
                         checked={selectedCategories.includes(cat)}
                         onCheckedChange={(checked) => handleCategoryToggle(cat, checked as boolean)}
-                        className="h-4 w-4"
                       />
                       <label
                         htmlFor={`cat-${cat}`}
-                        className="text-xs font-medium text-foreground cursor-pointer"
+                        className="text-sm font-medium text-foreground cursor-pointer"
                       >
                         {cat}
                       </label>
@@ -133,53 +153,65 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
                 )}
               </div>
 
-              {/* Code - Takes remaining space */}
-              <div className="flex flex-col flex-1 min-h-0 space-y-1">
-                <Label htmlFor="code" className="text-foreground text-sm flex-shrink-0">Código HTML/CSS</Label>
+              {/* Code */}
+              <div className="space-y-2">
+                <Label htmlFor="code" className="text-foreground">Código HTML/CSS</Label>
                 <Textarea
                   id="code"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="<button>Clique aqui</button>"
-                  className="bg-secondary border-border focus:border-primary font-mono text-sm flex-1 min-h-[100px] resize-none"
+                  className="bg-secondary border-border focus:border-primary font-mono text-sm min-h-[140px]"
                   required
                 />
               </div>
             </div>
 
             {/* Right Column - Live Preview and Image Upload */}
-            <div className="flex flex-col gap-3 min-h-0">
-              {/* Live Preview */}
-              <div className="flex flex-col flex-1 min-h-0 space-y-1">
-                <Label className="text-foreground text-sm flex-shrink-0">Preview ao Vivo</Label>
-                <div className="flex-1 min-h-[120px] overflow-hidden rounded-lg border border-border">
+            <div className="space-y-4 overflow-hidden">
+              <div className="space-y-2">
+                <Label className="text-foreground">Preview ao Vivo</Label>
+                <div className="overflow-hidden rounded-lg border border-border">
                   <CodePreview 
                     code={code} 
-                    className="w-full h-full"
+                    className="aspect-video min-h-[200px] max-h-[220px]"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground flex-shrink-0">
+                <p className="text-xs text-muted-foreground">
                   A visualização será atualizada conforme você digita o código
                 </p>
               </div>
 
               {/* Image Upload Section */}
-              <div className="flex flex-col flex-1 min-h-0 space-y-1">
-                <Label className="text-foreground text-sm flex items-center gap-2 flex-shrink-0">
+              <div className="space-y-2">
+                <Label className="text-foreground flex items-center gap-2">
                   <Image className="w-4 h-4" />
                   Imagem de Pré-visualização (opcional)
                 </Label>
                 <ImageDropZone
                   value={previewImage}
                   onChange={setPreviewImage}
-                  className="flex-1 min-h-[100px]"
+                  className="aspect-video min-h-[140px]"
                 />
+                
+                {/* URL fallback input */}
+                <div className="space-y-1">
+                  <Input
+                    value={previewImage}
+                    onChange={(e) => setPreviewImage(e.target.value)}
+                    placeholder="URL da imagem para mostrar quando não houver hover"
+                    className="bg-secondary border-border focus:border-primary text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Para elementos com animação: uma imagem aparece quando o mouse não está em cima
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Submit */}
-          <div className="flex gap-3 pt-4 flex-shrink-0">
+          <div className="flex gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
@@ -194,7 +226,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
               disabled={selectedCategories.length === 0}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Adicionar
+              Elemento
             </Button>
           </div>
         </form>
