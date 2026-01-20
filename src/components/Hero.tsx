@@ -2,26 +2,20 @@ import { Sparkles } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative pt-16 pb-8 px-4 text-center">
-      {/* Background effects - positioned to extend beyond section bounds */}
-      <div className="absolute inset-0 pointer-events-none" style={{ overflow: 'visible' }}>
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full blur-[120px]"
-          style={{
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: 'radial-gradient(circle, hsl(var(--primary) / 0.08) 0%, transparent 70%)',
-          }}
-        />
-        <div 
-          className="absolute w-[400px] h-[400px] rounded-full blur-[100px]"
-          style={{
-            top: '20%',
-            left: '30%',
-            background: 'radial-gradient(circle, hsl(var(--accent) / 0.06) 0%, transparent 70%)',
-          }}
-        />
-      </div>
+    <section className="relative pt-16 pb-8 px-4 text-center overflow-visible">
+      {/* Background glow effect */}
+      <div 
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 50% 40% at center, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.05) 30%, transparent 70%)',
+        }}
+      />
+      <div 
+        className="absolute left-[30%] top-[30%] w-[400px] h-[400px] pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at center, hsl(var(--accent) / 0.08) 0%, transparent 60%)',
+        }}
+      />
 
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 animate-fade-in">
