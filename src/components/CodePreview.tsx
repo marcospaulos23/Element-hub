@@ -7,7 +7,6 @@ interface CodePreviewProps {
 
 const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
   const previewHtml = useMemo(() => {
-    // Create a safe preview by wrapping the code
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -29,26 +28,15 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               justify-content: center;
             }
             .preview-wrapper {
-              position: relative;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              width: 100%;
-              height: 100%;
-              padding: 0;
-              overflow: hidden;
-            }
-            #transformer {
-              will-change: transform;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
             }
             .preview-content {
-              position: relative;
-              display: inline-block;
               transform-origin: center center;
-              will-change: transform;
             }
 
-            /* Minimal Tailwind animation compat */
             @keyframes spin { to { transform: rotate(360deg); } }
             @keyframes ping {
               75%, 100% { transform: scale(2); opacity: 0; }
@@ -65,150 +53,70 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
           </style>
         </head>
         <body>
-          <div class="preview-wrapper" id="wrapper">
-            <div id="transformer">
-              <div class="preview-content" id="content">
-                ${code}
-              </div>
+          <div class="preview-wrapper">
+            <div class="preview-content" id="content">
+              ${code}
             </div>
           </div>
 
           <script>
-            function unionRectFor(root) {
-              const rects = [root.getBoundingClientRect()];
-              const nodes = root.querySelectorAll ? root.querySelectorAll('*') : [];
-              for (let i = 0; i < nodes.length; i++) {
-                // Skip invisible nodes quickly (but keep opacity animations)
-                const el = nodes[i];
-                const cs = window.getComputedStyle(el);
-                if (cs.display === 'none' || cs.visibility === 'hidden') continue;
-                rects.push(el.getBoundingClientRect());
-              }
-
-              let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
-              for (let i = 0; i < rects.length; i++) {
-                const r = rects[i];
-                if (!isFinite(r.left) || !isFinite(r.top) || !isFinite(r.right) || !isFinite(r.bottom)) continue;
-                left = Math.min(left, r.left);
-                top = Math.min(top, r.top);
-                right = Math.max(right, r.right);
-                bottom = Math.max(bottom, r.bottom);
-              }
-
-              if (!isFinite(left) || !isFinite(top) || !isFinite(right) || !isFinite(bottom)) {
-                return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0, cx: 0, cy: 0 };
-              }
-
-              const width = Math.max(0, right - left);
-              const height = Math.max(0, bottom - top);
+            function getContentBounds(el) {
+              const rect = el.getBoundingClientRect();
+              let bounds = { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom };
+              
+              el.querySelectorAll('*').forEach(child => {
+                const r = child.getBoundingClientRect();
+                if (r.width === 0 && r.height === 0) return;
+                bounds.left = Math.min(bounds.left, r.left);
+                bounds.top = Math.min(bounds.top, r.top);
+                bounds.right = Math.max(bounds.right, r.right);
+                bounds.bottom = Math.max(bounds.bottom, r.bottom);
+              });
+              
               return {
-                left,
-                top,
-                right,
-                bottom,
-                width,
-                height,
-                cx: left + width / 2,
-                cy: top + height / 2,
+                width: bounds.right - bounds.left,
+                height: bounds.bottom - bounds.top
               };
             }
 
-            function nextFrame() {
-              return new Promise((resolve) => requestAnimationFrame(() => resolve()));
-            }
+            async function fitContent() {
+              const content = document.getElementById('content');
+              if (!content) return;
 
-            async function sampleMaxRect(root, ms) {
+              content.style.transform = 'scale(1)';
+              
+              await new Promise(r => requestAnimationFrame(r));
+
+              // Medir por 1.5s para pegar o tamanho máximo da animação
+              let maxW = 0, maxH = 0;
               const start = performance.now();
-              let max = null;
-
-              while (performance.now() - start < ms) {
-                const r = unionRectFor(root);
-                if (!max) {
-                  max = r;
-                } else {
-                  max.left = Math.min(max.left, r.left);
-                  max.top = Math.min(max.top, r.top);
-                  max.right = Math.max(max.right, r.right);
-                  max.bottom = Math.max(max.bottom, r.bottom);
-                  max.width = Math.max(0, max.right - max.left);
-                  max.height = Math.max(0, max.bottom - max.top);
-                  max.cx = max.left + max.width / 2;
-                  max.cy = max.top + max.height / 2;
-                }
-                await nextFrame();
+              
+              while (performance.now() - start < 1500) {
+                const bounds = getContentBounds(content);
+                maxW = Math.max(maxW, bounds.width);
+                maxH = Math.max(maxH, bounds.height);
+                await new Promise(r => requestAnimationFrame(r));
               }
 
-              return max || unionRectFor(root);
-            }
+              const viewW = window.innerWidth;
+              const viewH = window.innerHeight;
+              const padding = 40;
 
-            let centerRaf = null;
+              const scaleX = (viewW - padding) / maxW;
+              const scaleY = (viewH - padding) / maxH;
+              
+              // Escala entre 0.5 e 1 para não ficar muito pequeno nem muito grande
+              let scale = Math.min(scaleX, scaleY, 1);
+              scale = Math.max(scale, 0.5);
 
-            function startCenterLoop() {
-              const wrapper = document.getElementById('wrapper');
-              const transformer = document.getElementById('transformer');
-              const content = document.getElementById('content');
-              if (!wrapper || !transformer || !content) return;
-
-              if (centerRaf) cancelAnimationFrame(centerRaf);
-
-              const tick = () => {
-                const wrapperRect = wrapper.getBoundingClientRect();
-                const rect = unionRectFor(content);
-
-                const wrapperCx = wrapperRect.left + wrapperRect.width / 2;
-                const wrapperCy = wrapperRect.top + wrapperRect.height / 2;
-
-                const dx = wrapperCx - rect.cx;
-                const dy = wrapperCy - rect.cy;
-
-                transformer.style.transform = 'translate3d(' + dx + 'px, ' + dy + 'px, 0)';
-                centerRaf = requestAnimationFrame(tick);
-              };
-
-              tick();
-            }
-
-            async function fitToPreview() {
-              const wrapper = document.getElementById('wrapper');
-              const transformer = document.getElementById('transformer');
-              const content = document.getElementById('content');
-              if (!wrapper || !transformer || !content) return;
-
-              // Reset transforms
-              transformer.style.transform = 'translate3d(0px, 0px, 0)';
-              content.style.transform = 'scale(1)';
-
-              // Give layout a frame
-              await nextFrame();
-
-              // Measure max animated bounds over ~2.2s (cobre a maioria dos loops de animação)
-              const maxRect = await sampleMaxRect(content, 2200);
-              const wrapperRect = wrapper.getBoundingClientRect();
-
-              // A small safety margin so glow/shadows won't touch edges
-              const margin = 12;
-              const availableWidth = Math.max(1, wrapperRect.width - margin * 2);
-              const availableHeight = Math.max(1, wrapperRect.height - margin * 2);
-
-              const w = Math.max(1, maxRect.width);
-              const h = Math.max(1, maxRect.height);
-
-              const scale = Math.min(availableWidth / w, availableHeight / h, 1);
               content.style.transform = 'scale(' + scale + ')';
-
-              // Keep the animation centered at all times
-              await nextFrame();
-              startCenterLoop();
             }
 
-            // Run multiple times to catch dynamic rendering/animations
             window.addEventListener('load', () => {
-              fitToPreview();
-              setTimeout(fitToPreview, 200);
-              setTimeout(fitToPreview, 600);
+              fitContent();
             });
-            window.addEventListener('resize', () => fitToPreview());
-            setTimeout(fitToPreview, 50);
+            
+            setTimeout(fitContent, 100);
           </script>
         </body>
       </html>
