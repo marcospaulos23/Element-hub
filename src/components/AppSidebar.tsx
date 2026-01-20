@@ -1,4 +1,5 @@
 import { Home, BookOpen, Settings, HelpCircle, PanelLeft, Sparkles, FolderPlus, LayoutGrid } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -24,9 +25,9 @@ const AppSidebar = ({ onAddCategory, onManageElements }: AppSidebarProps) => {
   const isCollapsed = state === "collapsed";
 
   const mainNavItems = [
-    { title: "Início", icon: Home, href: "#" },
-    { title: "Como Utilizar", icon: BookOpen, href: "#guide" },
-    { title: "Novidades", icon: Sparkles, href: "#news" },
+    { title: "Início", icon: Home, href: "/", isRoute: true },
+    { title: "Como Utilizar", icon: BookOpen, href: "#guide", isRoute: false },
+    { title: "Novidades", icon: Sparkles, href: "#news", isRoute: false },
   ];
 
   const secondaryNavItems = [
@@ -94,10 +95,17 @@ const AppSidebar = ({ onAddCategory, onManageElements }: AppSidebarProps) => {
                     asChild
                     tooltip={item.title}
                   >
-                    <a href={item.href}>
-                      <item.icon className="h-4 w-4" />
-                      {!isCollapsed && <span>{item.title}</span>}
-                    </a>
+                    {item.isRoute ? (
+                      <Link to={item.href}>
+                        <item.icon className="h-4 w-4" />
+                        {!isCollapsed && <span>{item.title}</span>}
+                      </Link>
+                    ) : (
+                      <a href={item.href}>
+                        <item.icon className="h-4 w-4" />
+                        {!isCollapsed && <span>{item.title}</span>}
+                      </a>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
