@@ -92,7 +92,7 @@ const Index = () => {
           </header>
 
           {/* Main Content Area */}
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto">
             <Hero />
 
             {/* Elements Section */}
