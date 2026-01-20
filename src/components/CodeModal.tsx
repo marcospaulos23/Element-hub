@@ -27,7 +27,7 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden bg-popover border-border p-0">
+      <DialogContent className="max-w-5xl bg-popover border-border p-0">
         <DialogHeader className="p-6 pb-4 border-b border-border">
           <div className="flex items-center justify-between">
             <div>
@@ -39,7 +39,7 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
           </div>
         </DialogHeader>
 
-        {/* Main Content - Code and Preview side by side 50/50 */}
+        {/* Main Content - Code and Preview side by side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
           {/* Code Section */}
           <div className="flex flex-col">
@@ -63,9 +63,9 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
               </button>
             </div>
             
-            <div className="relative rounded-lg bg-code-bg border border-border overflow-hidden flex-1">
-              <pre className="p-4 overflow-auto h-[250px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full">
-                <code className="text-sm font-mono text-foreground/90 leading-relaxed">
+            <div className="relative rounded-lg bg-code-bg border border-border overflow-hidden h-[280px]">
+              <pre className="p-4 overflow-auto h-full w-full [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full">
+                <code className="text-sm font-mono text-foreground/90 leading-relaxed whitespace-pre">
                   {element.code}
                 </code>
               </pre>
@@ -77,7 +77,7 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
             <div className="mb-3">
               <span className="text-sm font-medium text-muted-foreground">Preview</span>
             </div>
-            <div className="relative h-[250px] rounded-lg overflow-hidden border border-border bg-zinc-800/50 flex items-center justify-center flex-1">
+            <div className="relative h-[280px] rounded-lg overflow-hidden border border-border bg-zinc-800/50 flex items-center justify-center">
               {hasPreviewImage ? (
                 <img 
                   src={element.preview_image!} 
