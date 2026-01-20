@@ -60,63 +60,96 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
           </div>
 
           <script>
-            function getContentBounds(el) {
+            function getFullBounds(el) {
+              let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+              
               const rect = el.getBoundingClientRect();
-              let bounds = { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom };
+              left = Math.min(left, rect.left);
+              top = Math.min(top, rect.top);
+              right = Math.max(right, rect.right);
+              bottom = Math.max(bottom, rect.bottom);
               
               el.querySelectorAll('*').forEach(child => {
                 const r = child.getBoundingClientRect();
                 if (r.width === 0 && r.height === 0) return;
-                bounds.left = Math.min(bounds.left, r.left);
-                bounds.top = Math.min(bounds.top, r.top);
-                bounds.right = Math.max(bounds.right, r.right);
-                bounds.bottom = Math.max(bounds.bottom, r.bottom);
+                left = Math.min(left, r.left);
+                top = Math.min(top, r.top);
+                right = Math.max(right, r.right);
+                bottom = Math.max(bottom, r.bottom);
               });
               
               return {
-                width: bounds.right - bounds.left,
-                height: bounds.bottom - bounds.top
+                left: left,
+                top: top,
+                right: right,
+                bottom: bottom,
+                width: right - left,
+                height: bottom - top,
+                cx: (left + right) / 2,
+                cy: (top + bottom) / 2
               };
             }
 
-            async function fitContent() {
+            async function fitAndCenter() {
               const content = document.getElementById('content');
-              if (!content) return;
+              const wrapper = document.querySelector('.preview-wrapper');
+              if (!content || !wrapper) return;
 
+              // Reset
               content.style.transform = 'scale(1)';
+              wrapper.style.transform = 'translate(-50%, -50%)';
               
               await new Promise(r => requestAnimationFrame(r));
 
               // Medir por 1.5s para pegar o tamanho máximo da animação
-              let maxW = 0, maxH = 0;
+              let minL = Infinity, minT = Infinity, maxR = -Infinity, maxB = -Infinity;
               const start = performance.now();
               
               while (performance.now() - start < 1500) {
-                const bounds = getContentBounds(content);
-                maxW = Math.max(maxW, bounds.width);
-                maxH = Math.max(maxH, bounds.height);
+                const bounds = getFullBounds(content);
+                minL = Math.min(minL, bounds.left);
+                minT = Math.min(minT, bounds.top);
+                maxR = Math.max(maxR, bounds.right);
+                maxB = Math.max(maxB, bounds.bottom);
                 await new Promise(r => requestAnimationFrame(r));
               }
 
+              const maxW = maxR - minL;
+              const maxH = maxB - minT;
+              const maxCx = (minL + maxR) / 2;
+              const maxCy = (minT + maxB) / 2;
+
               const viewW = window.innerWidth;
               const viewH = window.innerHeight;
-              const padding = 40;
+              const padding = 20;
 
               const scaleX = (viewW - padding) / maxW;
               const scaleY = (viewH - padding) / maxH;
               
-              // Escala entre 0.5 e 1 para não ficar muito pequeno nem muito grande
               let scale = Math.min(scaleX, scaleY, 1);
-              scale = Math.max(scale, 0.5);
+              scale = Math.max(scale, 0.4);
 
               content.style.transform = 'scale(' + scale + ')';
+
+              // Recalcular centro após escala e ajustar posição
+              await new Promise(r => requestAnimationFrame(r));
+              
+              const screenCx = viewW / 2;
+              const screenCy = viewH / 2;
+              
+              // Pegar o centro atual do conteúdo escalado
+              const newBounds = getFullBounds(content);
+              const offsetX = screenCx - newBounds.cx;
+              const offsetY = screenCy - newBounds.cy;
+              
+              wrapper.style.transform = 'translate(calc(-50% + ' + offsetX + 'px), calc(-50% + ' + offsetY + 'px))';
             }
 
             window.addEventListener('load', () => {
-              fitContent();
+              fitAndCenter();
             });
             
-            setTimeout(fitContent, 100);
+            setTimeout(fitAndCenter, 100);
           </script>
         </body>
       </html>
