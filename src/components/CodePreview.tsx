@@ -14,9 +14,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
         <head>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
-            * {
-              box-sizing: border-box;
-            }
+            * { box-sizing: border-box; }
             html, body {
               margin: 0;
               padding: 0;
@@ -31,131 +29,163 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               justify-content: center;
             }
             .preview-wrapper {
+              position: relative;
               display: flex;
               align-items: center;
               justify-content: center;
               width: 100%;
               height: 100%;
-              padding: 24px;
+              padding: 0;
+              overflow: hidden;
+            }
+            #transformer {
+              will-change: transform;
             }
             .preview-content {
+              position: relative;
+              display: inline-block;
               transform-origin: center center;
+              will-change: transform;
             }
-            @keyframes spin {
-              to { transform: rotate(360deg); }
-            }
+
+            /* Minimal Tailwind animation compat */
+            @keyframes spin { to { transform: rotate(360deg); } }
             @keyframes ping {
-              75%, 100% {
-                transform: scale(2);
-                opacity: 0;
-              }
+              75%, 100% { transform: scale(2); opacity: 0; }
             }
-            @keyframes pulse {
-              0%, 100% { opacity: 1; }
-              50% { opacity: 0.5; }
-            }
+            @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
             @keyframes bounce {
               0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
               50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
             }
-            .animate-spin {
-              animation: spin 1s linear infinite;
-            }
-            .animate-ping {
-              animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-            }
-            .animate-pulse {
-              animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-            }
-            .animate-bounce {
-              animation: bounce 1s infinite;
-            }
+            .animate-spin { animation: spin 1s linear infinite; }
+            .animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+            .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+            .animate-bounce { animation: bounce 1s infinite; }
           </style>
         </head>
         <body>
-          <div class="preview-wrapper">
-            <div class="preview-content" id="content">
-              ${code}
+          <div class="preview-wrapper" id="wrapper">
+            <div id="transformer">
+              <div class="preview-content" id="content">
+                ${code}
+              </div>
             </div>
           </div>
+
           <script>
-            function getMaxAnimatedSize(element) {
-              // Get computed styles to detect animations
-              const styles = window.getComputedStyle(element);
-              const animation = styles.animation || styles.webkitAnimation || '';
-              
-              let maxScale = 1;
-              
-              // Check for ping animation (scales to 2x)
-              if (animation.includes('ping')) {
-                maxScale = Math.max(maxScale, 2);
+            function unionRectFor(root) {
+              const rects = [root.getBoundingClientRect()];
+              const nodes = root.querySelectorAll ? root.querySelectorAll('*') : [];
+              for (let i = 0; i < nodes.length; i++) {
+                // Skip invisible nodes quickly (but keep opacity animations)
+                const el = nodes[i];
+                const cs = window.getComputedStyle(el);
+                if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+                rects.push(el.getBoundingClientRect());
               }
-              
-              // Check for bounce animation (moves up 25%)
-              if (animation.includes('bounce')) {
-                maxScale = Math.max(maxScale, 1.25);
+
+              let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+              for (let i = 0; i < rects.length; i++) {
+                const r = rects[i];
+                if (!isFinite(r.left) || !isFinite(r.top) || !isFinite(r.right) || !isFinite(r.bottom)) continue;
+                left = Math.min(left, r.left);
+                top = Math.min(top, r.top);
+                right = Math.max(right, r.right);
+                bottom = Math.max(bottom, r.bottom);
               }
-              
-              // Check all children for animations too
-              element.querySelectorAll('*').forEach(child => {
-                const childStyles = window.getComputedStyle(child);
-                const childAnimation = childStyles.animation || childStyles.webkitAnimation || '';
-                
-                if (childAnimation.includes('ping')) {
-                  maxScale = Math.max(maxScale, 2);
-                }
-                if (childAnimation.includes('bounce')) {
-                  maxScale = Math.max(maxScale, 1.25);
-                }
-              });
-              
-              return maxScale;
+
+              if (!isFinite(left) || !isFinite(top) || !isFinite(right) || !isFinite(bottom)) {
+                return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0, cx: 0, cy: 0 };
+              }
+
+              const width = Math.max(0, right - left);
+              const height = Math.max(0, bottom - top);
+              return {
+                left,
+                top,
+                right,
+                bottom,
+                width,
+                height,
+                cx: left + width / 2,
+                cy: top + height / 2,
+              };
             }
-            
-            function scaleContent() {
-              const wrapper = document.querySelector('.preview-wrapper');
+
+            function nextFrame() {
+              return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+            }
+
+            async function sampleMaxRect(root, ms) {
+              const start = performance.now();
+              let max = null;
+
+              while (performance.now() - start < ms) {
+                const r = unionRectFor(root);
+                if (!max) {
+                  max = r;
+                } else {
+                  max.left = Math.min(max.left, r.left);
+                  max.top = Math.min(max.top, r.top);
+                  max.right = Math.max(max.right, r.right);
+                  max.bottom = Math.max(max.bottom, r.bottom);
+                  max.width = Math.max(0, max.right - max.left);
+                  max.height = Math.max(0, max.bottom - max.top);
+                  max.cx = max.left + max.width / 2;
+                  max.cy = max.top + max.height / 2;
+                }
+                await nextFrame();
+              }
+
+              return max || unionRectFor(root);
+            }
+
+            async function fitToPreview() {
+              const wrapper = document.getElementById('wrapper');
+              const transformer = document.getElementById('transformer');
               const content = document.getElementById('content');
-              if (!wrapper || !content) return;
-              
-              // Reset scale first
+              if (!wrapper || !transformer || !content) return;
+
+              // Reset transforms
+              transformer.style.transform = 'translate(0px, 0px)';
               content.style.transform = 'scale(1)';
-              
+
+              // Give layout a frame
+              await nextFrame();
+
+              // Measure max animated bounds over ~0.9s (covers ping/bounce etc.)
+              const maxRect = await sampleMaxRect(content, 900);
               const wrapperRect = wrapper.getBoundingClientRect();
-              const contentRect = content.getBoundingClientRect();
-              
-              // Get available space (with padding)
-              const availableWidth = wrapperRect.width - 48;
-              const availableHeight = wrapperRect.height - 48;
-              
-              // Get the max animation scale factor
-              const animationScale = getMaxAnimatedSize(content);
-              
-              // Calculate the effective size including animation expansion
-              const effectiveWidth = contentRect.width * animationScale;
-              const effectiveHeight = contentRect.height * animationScale;
-              
-              // Calculate scale needed
-              const scaleX = availableWidth / effectiveWidth;
-              const scaleY = availableHeight / effectiveHeight;
-              
-              let scale = Math.min(scaleX, scaleY, 1);
-              
-              // Apply scale
+
+              const availableWidth = wrapperRect.width;
+              const availableHeight = wrapperRect.height;
+
+              const w = Math.max(1, maxRect.width);
+              const h = Math.max(1, maxRect.height);
+
+              const scale = Math.min(availableWidth / w, availableHeight / h, 1);
               content.style.transform = 'scale(' + scale + ')';
+
+              // Re-measure once after scale and center via translate
+              await nextFrame();
+              const scaledRect = unionRectFor(content);
+              const wrapperCx = wrapperRect.left + wrapperRect.width / 2;
+              const wrapperCy = wrapperRect.top + wrapperRect.height / 2;
+
+              const dx = wrapperCx - scaledRect.cx;
+              const dy = wrapperCy - scaledRect.cy;
+              transformer.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
             }
-            
-            // Run on load and resize
-            window.addEventListener('load', function() {
-              setTimeout(scaleContent, 100);
-              setTimeout(scaleContent, 300);
+
+            // Run multiple times to catch dynamic rendering/animations
+            window.addEventListener('load', () => {
+              fitToPreview();
+              setTimeout(fitToPreview, 200);
+              setTimeout(fitToPreview, 600);
             });
-            window.addEventListener('resize', scaleContent);
-            
-            // Run multiple times to catch dynamic content
-            setTimeout(scaleContent, 50);
-            setTimeout(scaleContent, 200);
-            setTimeout(scaleContent, 500);
-            setTimeout(scaleContent, 1000);
+            window.addEventListener('resize', () => fitToPreview());
+            setTimeout(fitToPreview, 50);
           </script>
         </body>
       </html>
