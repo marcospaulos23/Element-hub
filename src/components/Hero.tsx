@@ -24,7 +24,7 @@ const Hero = () => {
           <span className="gradient-text">Element Hub</span>
         </h1>
 
-        <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto animate-fade-in leading-relaxed" style={{ animationDelay: "200ms" }}>
+        <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto mb-10 animate-fade-in leading-relaxed" style={{ animationDelay: "200ms" }}>
           Explore nossa coleção de componentes UI modernos. Veja em ação e copie o código
           para usar em seus projetos.
         </p>
