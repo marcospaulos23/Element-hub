@@ -38,7 +38,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       />
 
       {/* Code Preview / Image */}
-      <div className="relative aspect-video overflow-hidden bg-muted/30">
+      <div className="relative aspect-[16/10] overflow-hidden bg-muted/30">
         {/* Always render CodePreview but hide it when showing preview image */}
         <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
           <CodePreview code={element.code} className="w-full h-full" />
@@ -54,7 +54,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       </div>
 
       {/* Info */}
-      <div className="p-5">
+      <div className="p-4">
         <div className="flex flex-wrap items-center gap-2 mb-3">
           {categories.map((cat, index) => (
             <span 
