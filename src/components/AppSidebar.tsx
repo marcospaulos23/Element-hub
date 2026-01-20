@@ -1,4 +1,4 @@
-import { Home, BookOpen, Settings, HelpCircle, Plus, PanelLeft, Sparkles, FolderPlus } from "lucide-react";
+import { Home, BookOpen, Settings, HelpCircle, PanelLeft, Sparkles, FolderPlus, Trash2, Pencil } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,12 +13,28 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { UIElement } from "@/hooks/useElements";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface AppSidebarProps {
   onAddCategory: () => void;
+  elements: UIElement[];
+  onDeleteElement: (id: string) => void;
+  onEditElement: (element: UIElement) => void;
 }
 
-const AppSidebar = ({ onAddCategory }: AppSidebarProps) => {
+const AppSidebar = ({ onAddCategory, elements, onDeleteElement, onEditElement }: AppSidebarProps) => {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
 
@@ -93,6 +109,66 @@ const AppSidebar = ({ onAddCategory }: AppSidebarProps) => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarSeparator />
+
+        {/* Elements Management */}
+        {!isCollapsed && elements.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Gerenciar Elementos</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <ScrollArea className="h-[200px]">
+                <SidebarMenu>
+                  {elements.map((element) => (
+                    <SidebarMenuItem key={element.id}>
+                      <div className="flex items-center justify-between w-full px-2 py-1.5 text-sm rounded-md hover:bg-muted group">
+                        <span className="truncate flex-1 text-foreground/80">
+                          {element.name}
+                        </span>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => onEditElement(element)}
+                            className="p-1 hover:bg-primary/20 rounded text-primary"
+                            title="Editar"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button
+                                className="p-1 hover:bg-destructive/20 rounded text-destructive"
+                                title="Excluir"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Excluir elemento?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Tem certeza que deseja excluir "{element.name}"? Esta ação não pode ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => onDeleteElement(element.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </ScrollArea>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         <SidebarSeparator />
 
