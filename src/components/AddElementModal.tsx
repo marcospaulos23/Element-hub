@@ -48,7 +48,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-popover border-border">
+      <DialogContent className="max-w-4xl bg-popover border-border">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary" />
