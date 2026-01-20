@@ -69,12 +69,7 @@ const Index = () => {
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         {/* Sidebar */}
-        <AppSidebar 
-          onAddCategory={() => setIsAddCategoryModalOpen(true)} 
-          elements={elements}
-          onDeleteElement={handleDeleteElement}
-          onEditElement={handleEditElement}
-        />
+        <AppSidebar onAddCategory={() => setIsAddCategoryModalOpen(true)} />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
