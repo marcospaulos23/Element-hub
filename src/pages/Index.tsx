@@ -32,13 +32,40 @@ const Index = () => {
     return ["Todos", ...categoriesData.map(c => c.name)];
   }, [categoriesData]);
 
-  const filteredElements = useMemo(() => {
-    if (activeCategory === "Todos") return elements;
-    return elements.filter((el) => {
-      const cats = Array.isArray(el.category) ? el.category : [el.category];
-      return cats.includes(activeCategory);
+  // Group elements by category
+  const elementsByCategory = useMemo(() => {
+    const grouped: Record<string, UIElement[]> = {};
+    
+    // Initialize all categories (except "Todos")
+    categoriesData.forEach(cat => {
+      grouped[cat.name] = [];
     });
-  }, [activeCategory, elements]);
+    
+    // Distribute elements into their categories
+    elements.forEach(el => {
+      const cats = Array.isArray(el.category) ? el.category : [el.category];
+      cats.forEach(catName => {
+        if (grouped[catName]) {
+          // Avoid duplicates in the same category
+          if (!grouped[catName].find(e => e.id === el.id)) {
+            grouped[catName].push(el);
+          }
+        }
+      });
+    });
+    
+    return grouped;
+  }, [elements, categoriesData]);
+
+  // Filter categories to display based on active filter
+  const categoriesToDisplay = useMemo(() => {
+    if (activeCategory === "Todos") {
+      // Show all categories that have elements
+      return categoriesData.filter(cat => elementsByCategory[cat.name]?.length > 0);
+    }
+    // Show only the selected category
+    return categoriesData.filter(cat => cat.name === activeCategory && elementsByCategory[cat.name]?.length > 0);
+  }, [activeCategory, categoriesData, elementsByCategory]);
 
   const handleElementClick = (element: UIElement) => {
     setSelectedElement(element);
@@ -120,21 +147,33 @@ const Index = () => {
                   </div>
                 )}
 
-                {/* Elements Grid */}
-                {!loading && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredElements.map((element) => (
-                      <ElementCard
-                        key={element.id}
-                        element={element}
-                        onClick={() => handleElementClick(element)}
-                      />
+                {/* Elements Grouped by Category */}
+                {!loading && categoriesToDisplay.length > 0 && (
+                  <div className="space-y-16">
+                    {categoriesToDisplay.map((category) => (
+                      <div key={category.id}>
+                        {/* Category Title */}
+                        <h2 className="text-2xl font-semibold text-foreground mb-6 border-b border-border pb-3">
+                          {category.name}
+                        </h2>
+                        
+                        {/* Elements Grid for this Category */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                          {elementsByCategory[category.name]?.map((element) => (
+                            <ElementCard
+                              key={element.id}
+                              element={element}
+                              onClick={() => handleElementClick(element)}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
 
                 {/* Empty State */}
-                {!loading && filteredElements.length === 0 && (
+                {!loading && categoriesToDisplay.length === 0 && (
                   <div className="text-center py-20 px-4">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                       <span className="text-2xl">🔍</span>
