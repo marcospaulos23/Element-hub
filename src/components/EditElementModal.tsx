@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Image, X } from "lucide-react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
+import ImageDropZone from "./ImageDropZone";
 
 interface EditElementModalProps {
   isOpen: boolean;
@@ -28,7 +29,6 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
     if (element) {
       setName(element.name);
       setDescription(element.description);
-      // Handle both old string format and new array format
       const cats = Array.isArray(element.category) ? element.category : [element.category];
       setSelectedCategories(cats);
       setCode(element.code);
@@ -161,24 +161,6 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
                 )}
               </div>
 
-              {/* Preview Image URL */}
-              <div className="space-y-2">
-                <Label htmlFor="edit-previewImage" className="text-foreground flex items-center gap-2">
-                  <Image className="w-4 h-4" />
-                  Imagem de Preview (opcional)
-                </Label>
-                <Input
-                  id="edit-previewImage"
-                  value={previewImage}
-                  onChange={(e) => setPreviewImage(e.target.value)}
-                  placeholder="URL da imagem para mostrar quando não houver hover"
-                  className="bg-secondary border-border focus:border-primary"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Para elementos com animação: a imagem aparece quando o mouse não está em cima
-                </p>
-              </div>
-
               {/* Code */}
               <div className="space-y-2">
                 <Label htmlFor="edit-code" className="text-foreground">Código HTML/CSS</Label>
@@ -193,35 +175,46 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
               </div>
             </div>
 
-            {/* Right Column - Live Preview */}
-            <div className="space-y-2">
-              <Label className="text-foreground">Preview ao Vivo</Label>
-              <div className="overflow-hidden rounded-lg border border-border">
-                <CodePreview 
-                  code={code} 
-                  className="aspect-video min-h-[300px]"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                O preview será atualizado conforme você digita o código
-              </p>
-
-              {/* Preview Image Preview */}
-              {previewImage && (
-                <div className="space-y-2 mt-4">
-                  <Label className="text-foreground">Preview da Imagem Estática</Label>
-                  <div className="overflow-hidden rounded-lg border border-border bg-muted/30 aspect-video flex items-center justify-center">
-                    <img
-                      src={previewImage}
-                      alt="Preview"
-                      className="max-w-full max-h-full object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
+            {/* Right Column - Live Preview and Image Upload */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-foreground">Preview ao Vivo</Label>
+                <div className="overflow-hidden rounded-lg border border-border">
+                  <CodePreview 
+                    code={code} 
+                    className="aspect-video min-h-[200px] max-h-[220px]"
+                  />
                 </div>
-              )}
+                <p className="text-xs text-muted-foreground">
+                  O preview será atualizado conforme você digita o código
+                </p>
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="space-y-2">
+                <Label className="text-foreground flex items-center gap-2">
+                  <Image className="w-4 h-4" />
+                  Imagem de Pré-visualização (opcional)
+                </Label>
+                <ImageDropZone
+                  value={previewImage}
+                  onChange={setPreviewImage}
+                  className="aspect-video min-h-[140px]"
+                />
+                
+                {/* URL fallback input */}
+                <div className="space-y-1">
+                  <Input
+                    value={previewImage}
+                    onChange={(e) => setPreviewImage(e.target.value)}
+                    placeholder="URL da imagem para mostrar quando não houver hover"
+                    className="bg-secondary border-border focus:border-primary text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Para elementos com animação: uma imagem aparece quando o mouse não está em cima
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
