@@ -10,8 +10,16 @@ interface ElementCardProps {
 const ElementCard = ({ element, onClick }: ElementCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const hasPreviewImage = element.preview_image && element.preview_image.trim() !== "";
   const categories = Array.isArray(element.category) ? element.category : [element.category];
+  
+  // Only show preview image for elements with "Animações" or "Carregamento" categories
+  const isAnimationOrLoading = categories.some(cat => 
+    cat.toLowerCase().includes("animaç") || 
+    cat.toLowerCase().includes("carregamento") ||
+    cat.toLowerCase().includes("loaders") ||
+    cat.toLowerCase().includes("loading")
+  );
+  const hasPreviewImage = isAnimationOrLoading && element.preview_image && element.preview_image.trim() !== "";
 
   return (
     <div

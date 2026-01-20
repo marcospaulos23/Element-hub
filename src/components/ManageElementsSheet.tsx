@@ -114,11 +114,19 @@ const ManageElementsSheet = ({
                   key={element.id}
                   className="flex items-center p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                 >
-                  {/* Element Preview - Static thumbnail on LEFT */}
+                  {/* Element Preview - Show image if available, otherwise code preview */}
                   <div className="w-12 h-10 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0 flex items-center justify-center mr-3">
-                    <div className="w-[120px] h-[100px] transform scale-[0.1] origin-center">
-                      <CodePreview code={element.code} className="w-full h-full !border-0" />
-                    </div>
+                    {element.preview_image && element.preview_image.trim() !== "" ? (
+                      <img 
+                        src={element.preview_image} 
+                        alt={element.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-[120px] h-[100px] transform scale-[0.1] origin-center">
+                        <CodePreview code={element.code} className="w-full h-full !border-0" />
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">
