@@ -1,4 +1,4 @@
-import { Home, BookOpen, Settings, HelpCircle, PanelLeft, Sparkles, FolderPlus } from "lucide-react";
+import { Home, BookOpen, Settings, HelpCircle, PanelLeft, Sparkles, FolderPlus, LayoutGrid } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -16,9 +16,10 @@ import {
 
 interface AppSidebarProps {
   onAddCategory: () => void;
+  onManageElements: () => void;
 }
 
-const AppSidebar = ({ onAddCategory }: AppSidebarProps) => {
+const AppSidebar = ({ onAddCategory, onManageElements }: AppSidebarProps) => {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
 
@@ -52,7 +53,7 @@ const AppSidebar = ({ onAddCategory }: AppSidebarProps) => {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Add Category Button */}
+        {/* Action Buttons */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -64,6 +65,16 @@ const AppSidebar = ({ onAddCategory }: AppSidebarProps) => {
                 >
                   <FolderPlus className="h-4 w-4" />
                   {!isCollapsed && <span>Adicionar Categoria</span>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={onManageElements}
+                  tooltip="Gerenciar Elementos"
+                  className="bg-secondary hover:bg-secondary/80 text-foreground border border-border"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  {!isCollapsed && <span>Gerenciar Elementos</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -95,7 +106,6 @@ const AppSidebar = ({ onAddCategory }: AppSidebarProps) => {
         </SidebarGroup>
 
         <SidebarSeparator />
-
 
         {/* Secondary Navigation */}
         <SidebarGroup>
