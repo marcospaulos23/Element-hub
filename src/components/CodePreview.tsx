@@ -64,14 +64,20 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
             .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
             .animate-bounce { animation: bounce 1s infinite; }
             
-            /* Estado pausado */
-            body.paused * {
+            /* Estado pausado - para tudo */
+            body.paused #content,
+            body.paused #content * {
               animation-play-state: paused !important;
               transition: none !important;
             }
+            
+            /* Esconder durante medição */
+            body.measuring {
+              visibility: hidden;
+            }
           </style>
         </head>
-        <body class="${pauseOnIdle ? 'paused' : ''}">
+        <body class="${pauseOnIdle ? 'paused measuring' : ''}">
           <div id="container">
             <div id="scaler">
               <div id="content">
@@ -82,7 +88,7 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
 
           <script>
             let isPaused = ${pauseOnIdle ? 'true' : 'false'};
-            let rafId = null;
+            let hasMeasured = false;
             
             function getAllBounds(el) {
               let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
@@ -114,21 +120,17 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
               };
             }
 
-            let currentScale = 1;
-            let offsetX = 0;
-            let offsetY = 0;
-
             async function measureAndFit() {
               const container = document.getElementById('container');
               const scaler = document.getElementById('scaler');
               const content = document.getElementById('content');
               if (!container || !scaler || !content) return;
 
-              // Reset
+              // Reset transforms
               container.style.transform = 'translate(-50%, -50%)';
               scaler.style.transform = 'scale(1)';
               
-              // Temporariamente despausar para medir
+              // Temporariamente despausar para medir (invisível)
               document.body.classList.remove('paused');
               
               await new Promise(r => requestAnimationFrame(r));
@@ -160,50 +162,52 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
               const availableW = viewW - padding;
               const availableH = viewH - padding;
               
-              currentScale = 1;
+              let scale = 1;
               if (totalW > availableW || totalH > availableH) {
                 const scaleX = availableW / totalW;
                 const scaleY = availableH / totalH;
-                currentScale = Math.min(scaleX, scaleY);
+                scale = Math.min(scaleX, scaleY);
               }
               
-              scaler.style.transform = 'scale(' + currentScale + ')';
+              scaler.style.transform = 'scale(' + scale + ')';
               
               // Centro da tela
               const screenCx = viewW / 2;
               const screenCy = viewH / 2;
               
-              // Calcular offset para centralizar o centro da animação no centro da tela
-              offsetX = screenCx - animCx;
-              offsetY = screenCy - animCy;
+              // Offset inicial
+              const offsetX = screenCx - animCx;
+              const offsetY = screenCy - animCy;
+              container.style.transform = 'translate(calc(-50% + ' + offsetX + 'px), calc(-50% + ' + offsetY + 'px))';
               
-              // Restaurar estado pausado se necessário
+              // Pausar e mostrar
               if (isPaused) {
                 document.body.classList.add('paused');
               }
+              document.body.classList.remove('measuring');
+              hasMeasured = true;
+              
+              // Iniciar loop de centralização
+              keepCentered();
             }
 
             function keepCentered() {
-              if (isPaused) {
-                rafId = requestAnimationFrame(keepCentered);
-                return;
-              }
-              
               const container = document.getElementById('container');
               const content = document.getElementById('content');
               if (!container || !content) return;
               
-              const b = getAllBounds(content);
-              const viewW = window.innerWidth;
-              const viewH = window.innerHeight;
+              if (!isPaused) {
+                const b = getAllBounds(content);
+                const viewW = window.innerWidth;
+                const viewH = window.innerHeight;
+                
+                const dx = (viewW / 2) - b.cx;
+                const dy = (viewH / 2) - b.cy;
+                
+                container.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+              }
               
-              // Ajustar posição continuamente para manter no centro
-              const dx = (viewW / 2) - b.cx;
-              const dy = (viewH / 2) - b.cy;
-              
-              container.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
-              
-              rafId = requestAnimationFrame(keepCentered);
+              requestAnimationFrame(keepCentered);
             }
 
             // Escutar mensagens do React
@@ -218,13 +222,8 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
               }
             });
 
-            async function init() {
-              await measureAndFit();
-              keepCentered();
-            }
-
-            window.addEventListener('load', init);
-            setTimeout(init, 100);
+            window.addEventListener('load', () => measureAndFit());
+            setTimeout(measureAndFit, 50);
           </script>
         </body>
       </html>
