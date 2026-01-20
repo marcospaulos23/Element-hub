@@ -141,6 +141,33 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               return max || unionRectFor(root);
             }
 
+            let centerRaf = null;
+
+            function startCenterLoop() {
+              const wrapper = document.getElementById('wrapper');
+              const transformer = document.getElementById('transformer');
+              const content = document.getElementById('content');
+              if (!wrapper || !transformer || !content) return;
+
+              if (centerRaf) cancelAnimationFrame(centerRaf);
+
+              const tick = () => {
+                const wrapperRect = wrapper.getBoundingClientRect();
+                const rect = unionRectFor(content);
+
+                const wrapperCx = wrapperRect.left + wrapperRect.width / 2;
+                const wrapperCy = wrapperRect.top + wrapperRect.height / 2;
+
+                const dx = wrapperCx - rect.cx;
+                const dy = wrapperCy - rect.cy;
+
+                transformer.style.transform = 'translate3d(' + dx + 'px, ' + dy + 'px, 0)';
+                centerRaf = requestAnimationFrame(tick);
+              };
+
+              tick();
+            }
+
             async function fitToPreview() {
               const wrapper = document.getElementById('wrapper');
               const transformer = document.getElementById('transformer');
@@ -148,7 +175,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               if (!wrapper || !transformer || !content) return;
 
               // Reset transforms
-              transformer.style.transform = 'translate(0px, 0px)';
+              transformer.style.transform = 'translate3d(0px, 0px, 0)';
               content.style.transform = 'scale(1)';
 
               // Give layout a frame
@@ -158,6 +185,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const maxRect = await sampleMaxRect(content, 2200);
               const wrapperRect = wrapper.getBoundingClientRect();
 
+              // A small safety margin so glow/shadows won't touch edges
               const margin = 12;
               const availableWidth = Math.max(1, wrapperRect.width - margin * 2);
               const availableHeight = Math.max(1, wrapperRect.height - margin * 2);
@@ -168,38 +196,9 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const scale = Math.min(availableWidth / w, availableHeight / h, 1);
               content.style.transform = 'scale(' + scale + ')';
 
-              // Re-measure once after scale and center via translate
+              // Keep the animation centered at all times
               await nextFrame();
-              const scaledRect = unionRectFor(content);
-              const wrapperCx = wrapperRect.left + wrapperRect.width / 2;
-              const wrapperCy = wrapperRect.top + wrapperRect.height / 2;
-
-              let dx = wrapperCx - scaledRect.cx;
-              let dy = wrapperCy - scaledRect.cy;
-              transformer.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
-
-              // Ajuste fino para garantir que NENHUM lado fique cortado
-              await nextFrame();
-              const finalRect = unionRectFor(content);
-
-              let adjustX = 0;
-              let adjustY = 0;
-
-              const leftLimit = wrapperRect.left + margin;
-              const rightLimit = wrapperRect.right - margin;
-              const topLimit = wrapperRect.top + margin;
-              const bottomLimit = wrapperRect.bottom - margin;
-
-              if (finalRect.left < leftLimit) adjustX += (leftLimit - finalRect.left);
-              if (finalRect.right > rightLimit) adjustX -= (finalRect.right - rightLimit);
-              if (finalRect.top < topLimit) adjustY += (topLimit - finalRect.top);
-              if (finalRect.bottom > bottomLimit) adjustY -= (finalRect.bottom - bottomLimit);
-
-              if (adjustX !== 0 || adjustY !== 0) {
-                dx += adjustX;
-                dy += adjustY;
-                transformer.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
-              }
+              startCenterLoop();
             }
 
             // Run multiple times to catch dynamic rendering/animations
