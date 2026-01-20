@@ -24,19 +24,10 @@ const Hero = () => {
           <span className="gradient-text">Element Hub</span>
         </h1>
 
-        <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto mb-10 animate-fade-in leading-relaxed" style={{ animationDelay: "200ms" }}>
+        <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto animate-fade-in leading-relaxed" style={{ animationDelay: "200ms" }}>
           Explore nossa coleção de componentes UI modernos. Veja em ação e copie o código
           para usar em seus projetos.
         </p>
-
-        <div className="flex items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "300ms" }}>
-          <a href="#elements" className="btn-primary inline-flex items-center gap-2">
-            Explorar Elementos
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </a>
-        </div>
       </div>
     </section>
   );
