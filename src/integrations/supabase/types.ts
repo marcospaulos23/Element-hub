@@ -16,30 +16,33 @@ export type Database = {
     Tables: {
       elements: {
         Row: {
-          category: string
+          category: string[]
           code: string
           created_at: string
           description: string
           id: string
           name: string
+          preview_image: string | null
           updated_at: string
         }
         Insert: {
-          category: string
+          category: string[]
           code: string
           created_at?: string
           description: string
           id?: string
           name: string
+          preview_image?: string | null
           updated_at?: string
         }
         Update: {
-          category?: string
+          category?: string[]
           code?: string
           created_at?: string
           description?: string
           id?: string
           name?: string
+          preview_image?: string | null
           updated_at?: string
         }
         Relationships: []

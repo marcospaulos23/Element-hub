@@ -6,8 +6,9 @@ export interface UIElement {
   id: string;
   name: string;
   description: string;
-  category: string;
+  category: string[];
   code: string;
+  preview_image?: string | null;
 }
 
 export const useElements = () => {

@@ -46,17 +46,34 @@ const ManageElementsSheet = ({
 }: ManageElementsSheetProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  // Get unique categories
+  // Get unique categories from all elements (flattening arrays)
   const categories = useMemo(() => {
-    const cats = [...new Set(elements.map((el) => el.category))];
-    return cats.sort();
+    const allCats: string[] = [];
+    elements.forEach((el) => {
+      const cats = Array.isArray(el.category) ? el.category : [el.category];
+      cats.forEach((cat) => {
+        if (!allCats.includes(cat)) {
+          allCats.push(cat);
+        }
+      });
+    });
+    return allCats.sort();
   }, [elements]);
 
   // Filter elements by category
   const filteredElements = useMemo(() => {
     if (selectedCategory === "all") return elements;
-    return elements.filter((el) => el.category === selectedCategory);
+    return elements.filter((el) => {
+      const cats = Array.isArray(el.category) ? el.category : [el.category];
+      return cats.includes(selectedCategory);
+    });
   }, [elements, selectedCategory]);
+
+  // Helper to display categories
+  const displayCategories = (category: string | string[]) => {
+    const cats = Array.isArray(category) ? category : [category];
+    return cats.join(", ");
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -109,7 +126,7 @@ const ManageElementsSheet = ({
                       {element.name}
                     </h4>
                     <p className="text-sm text-muted-foreground truncate">
-                      {element.category}
+                      {displayCategories(element.category)}
                     </p>
                   </div>
 

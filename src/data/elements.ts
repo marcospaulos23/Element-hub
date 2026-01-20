@@ -2,8 +2,9 @@ export interface UIElement {
   id: string;
   name: string;
   description: string;
-  category: string;
+  category: string[];
   code: string;
+  preview_image?: string | null;
 }
 
 export const elements: UIElement[] = [
@@ -11,7 +12,7 @@ export const elements: UIElement[] = [
     id: "1",
     name: "Botão Neon",
     description: "Botão com efeito de brilho neon animado",
-    category: "Botões",
+    category: ["Botões"],
     code: `<button class="relative px-8 py-4 bg-transparent border-2 border-cyan-400 text-cyan-400 font-semibold rounded-lg overflow-hidden group">
   <span class="relative z-10">Hover Me</span>
   <div class="absolute inset-0 bg-cyan-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
@@ -24,7 +25,7 @@ export const elements: UIElement[] = [
     id: "2",
     name: "Card Glassmorphism",
     description: "Card com efeito de vidro fosco translúcido",
-    category: "Cards",
+    category: ["Cards"],
     code: `<div class="relative p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
   <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl"></div>
   <div class="relative z-10">
@@ -37,7 +38,7 @@ export const elements: UIElement[] = [
     id: "3",
     name: "Input Animado",
     description: "Campo de input com label flutuante animada",
-    category: "Forms",
+    category: ["Forms"],
     code: `<div class="relative group">
   <input 
     type="text" 
@@ -53,7 +54,7 @@ export const elements: UIElement[] = [
     id: "4",
     name: "Loading Spinner",
     description: "Spinner de carregamento com gradiente rotativo",
-    category: "Loaders",
+    category: ["Loaders"],
     code: `<div class="relative w-16 h-16">
   <div class="absolute inset-0 rounded-full border-4 border-gray-700"></div>
   <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-cyan-400 animate-spin"></div>
@@ -64,7 +65,7 @@ export const elements: UIElement[] = [
     id: "5",
     name: "Toggle Switch",
     description: "Switch toggle com animação suave",
-    category: "Forms",
+    category: ["Forms"],
     code: `<label class="relative inline-flex items-center cursor-pointer">
   <input type="checkbox" class="sr-only peer" />
   <div class="w-14 h-8 bg-gray-700 rounded-full peer peer-checked:bg-cyan-500 transition-colors duration-300">
@@ -76,7 +77,7 @@ export const elements: UIElement[] = [
     id: "6",
     name: "Badge Animado",
     description: "Badge com pulse de notificação",
-    category: "UI",
+    category: ["UI"],
     code: `<span class="relative inline-flex">
   <span class="px-4 py-2 bg-cyan-500/20 text-cyan-400 text-sm font-medium rounded-full border border-cyan-400/30">
     Novo
