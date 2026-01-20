@@ -92,13 +92,21 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
               {/* Category */}
               <div className="space-y-2">
                 <Label className="text-foreground">Categoria</Label>
-                <Select value={category} onValueChange={setCategory} required>
+              <Select value={category} onValueChange={setCategory} required>
                   <SelectTrigger className="bg-secondary border-border">
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
-                  <SelectContent className="bg-popover border-border">
+                  <SelectContent 
+                    className="bg-popover border-border z-[9999]" 
+                    position="popper"
+                    sideOffset={4}
+                  >
                     {filteredCategories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
+                      <SelectItem 
+                        key={cat} 
+                        value={cat}
+                        className="cursor-pointer hover:bg-secondary focus:bg-secondary"
+                      >
                         {cat}
                       </SelectItem>
                     ))}
