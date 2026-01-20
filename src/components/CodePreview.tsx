@@ -1,44 +1,16 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useMemo } from "react";
 
 interface CodePreviewProps {
   code: string;
   className?: string;
-  /**
-   * Quando true (usado no grid do repositório):
-   * - ao carregar: roda um instante e congela ("print" = frame atual)
-   * - ao hover: reinicia do início e roda
-   * - ao sair do hover: congela no frame atual
-   */
-  pauseOnIdle?: boolean;
 }
 
-const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewProps) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  const postToIframe = useCallback((message: unknown) => {
-    try {
-      iframeRef.current?.contentWindow?.postMessage(message, "*");
-    } catch {
-      // noop
-    }
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    if (!pauseOnIdle) return;
-    postToIframe({ type: "PLAY_FROM_START" });
-  }, [pauseOnIdle, postToIframe]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!pauseOnIdle) return;
-    postToIframe({ type: "FREEZE_FRAME" });
-  }, [pauseOnIdle, postToIframe]);
-
+const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
   const previewHtml = useMemo(() => {
     const htmlContent = `
       <!DOCTYPE html>
       <html>
         <head>
-          <meta charset="utf-8" />
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
             * { box-sizing: border-box; }
@@ -56,17 +28,14 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
               left: 50%;
               transform: translate(-50%, -50%);
             }
-            #scaler { transform-origin: center center; }
-
-            /* Pausa global (vira "print" do frame atual) */
-            body.paused #content,
-            body.paused #content * {
-              animation-play-state: paused !important;
+            #scaler {
+              transform-origin: center center;
             }
 
-            /* Tailwind-like animations (fallback) */
             @keyframes spin { to { transform: rotate(360deg); } }
-            @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+            @keyframes ping {
+              75%, 100% { transform: scale(2); opacity: 0; }
+            }
             @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
             @keyframes bounce {
               0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
@@ -78,21 +47,19 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
             .animate-bounce { animation: bounce 1s infinite; }
           </style>
         </head>
-        <body class="${pauseOnIdle ? "paused" : ""}">
+        <body>
           <div id="container">
             <div id="scaler">
-              <div id="content">${code}</div>
+              <div id="content">
+                ${code}
+              </div>
             </div>
           </div>
 
           <script>
-            const HOVER_MODE = ${pauseOnIdle ? "true" : "false"};
-            let rafId = null;
-            let isPlaying = !HOVER_MODE;
-            let savedScale = 1;
-
             function getAllBounds(el) {
               let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+              
               function measure(node) {
                 const r = node.getBoundingClientRect();
                 if (r.width > 0 || r.height > 0) {
@@ -102,11 +69,17 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
                   bottom = Math.max(bottom, r.bottom);
                 }
               }
+              
               measure(el);
               el.querySelectorAll('*').forEach(measure);
+              
               if (!isFinite(left)) return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0, cx: 0, cy: 0 };
+              
               return {
-                left, top, right, bottom,
+                left,
+                top,
+                right,
+                bottom,
                 width: right - left,
                 height: bottom - top,
                 cx: (left + right) / 2,
@@ -114,71 +87,27 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
               };
             }
 
-            function centerOnce() {
+            let currentScale = 1;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            async function measureAndFit() {
               const container = document.getElementById('container');
-              const content = document.getElementById('content');
-              if (!container || !content) return;
-              const b = getAllBounds(content);
-              const viewW = window.innerWidth;
-              const viewH = window.innerHeight;
-              const dx = (viewW / 2) - b.cx;
-              const dy = (viewH / 2) - b.cy;
-              container.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
-            }
-
-            function tick() {
-              if (!isPlaying) return;
-              centerOnce();
-              rafId = requestAnimationFrame(tick);
-            }
-
-            function startLoop() {
-              if (rafId) cancelAnimationFrame(rafId);
-              rafId = requestAnimationFrame(tick);
-            }
-
-            function stopLoop() {
-              if (rafId) cancelAnimationFrame(rafId);
-              rafId = null;
-            }
-
-            function freezeFrame() {
-              // Mantém o frame atual visível ("print") e para o loop
-              document.body.classList.add('paused');
-              isPlaying = false;
-              stopLoop();
-            }
-
-            function playFromStart() {
-              const content = document.getElementById('content');
-              const scaler = document.getElementById('scaler');
-              if (!content) return;
-
-              // Reinicia animações recriando o DOM do conteúdo
-              const original = content.__originalMarkup || content.innerHTML;
-              content.__originalMarkup = original;
-              content.innerHTML = original;
-
-              if (scaler) scaler.style.transform = 'scale(' + savedScale + ')';
-
-              document.body.classList.remove('paused');
-              isPlaying = true;
-              startLoop();
-            }
-
-            async function measureAndFitOnce() {
               const scaler = document.getElementById('scaler');
               const content = document.getElementById('content');
-              if (!scaler || !content) return;
+              if (!container || !scaler || !content) return;
 
-              // se estiver em hover mode, temporariamente roda para medir e depois congela
-              const wasPaused = document.body.classList.contains('paused');
-              document.body.classList.remove('paused');
+              // Reset
+              container.style.transform = 'translate(-50%, -50%)';
+              scaler.style.transform = 'scale(1)';
+              
+              await new Promise(r => requestAnimationFrame(r));
 
+              // Medir bounds máximos durante 1.5s de animação
               let minL = Infinity, minT = Infinity, maxR = -Infinity, maxB = -Infinity;
               const start = performance.now();
-
-              while (performance.now() - start < 650) {
+              
+              while (performance.now() - start < 1500) {
                 const b = getAllBounds(content);
                 minL = Math.min(minL, b.left);
                 minT = Math.min(minT, b.top);
@@ -189,64 +118,71 @@ const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewP
 
               const totalW = maxR - minL;
               const totalH = maxB - minT;
-
+              const animCx = (minL + maxR) / 2;
+              const animCy = (minT + maxB) / 2;
+              
+              // Tamanho do viewport
               const viewW = window.innerWidth;
               const viewH = window.innerHeight;
               const padding = 30;
+              
+              // Calcular escala
               const availableW = viewW - padding;
               const availableH = viewH - padding;
-
-              savedScale = 1;
+              
+              currentScale = 1;
               if (totalW > availableW || totalH > availableH) {
-                savedScale = Math.min(availableW / totalW, availableH / totalH);
+                const scaleX = availableW / totalW;
+                const scaleY = availableH / totalH;
+                currentScale = Math.min(scaleX, scaleY);
               }
-
-              scaler.style.transform = 'scale(' + savedScale + ')';
-
-              if (wasPaused) document.body.classList.add('paused');
+              
+              scaler.style.transform = 'scale(' + currentScale + ')';
+              
+              // Centro da tela
+              const screenCx = viewW / 2;
+              const screenCy = viewH / 2;
+              
+              // Calcular offset para centralizar o centro da animação no centro da tela
+              offsetX = screenCx - animCx;
+              offsetY = screenCy - animCy;
             }
 
-            window.addEventListener('message', (e) => {
-              if (!e.data || !e.data.type) return;
-              if (e.data.type === 'PLAY_FROM_START') playFromStart();
-              if (e.data.type === 'FREEZE_FRAME') freezeFrame();
-            });
+            function keepCentered() {
+              const container = document.getElementById('container');
+              const content = document.getElementById('content');
+              if (!container || !content) return;
+              
+              const b = getAllBounds(content);
+              const viewW = window.innerWidth;
+              const viewH = window.innerHeight;
+              
+              // Ajustar posição continuamente para manter no centro
+              const dx = (viewW / 2) - b.cx;
+              const dy = (viewH / 2) - b.cy;
+              
+              container.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+              
+              requestAnimationFrame(keepCentered);
+            }
 
             async function init() {
-              const content = document.getElementById('content');
-              if (content && !content.__originalMarkup) content.__originalMarkup = content.innerHTML;
-
-              await measureAndFitOnce();
-
-              if (HOVER_MODE) {
-                // gera um "print" inicial sem deixar tudo rodando
-                playFromStart();
-                setTimeout(() => freezeFrame(), 200);
-              } else {
-                document.body.classList.remove('paused');
-                isPlaying = true;
-                startLoop();
-              }
+              await measureAndFit();
+              keepCentered();
             }
 
             window.addEventListener('load', init);
-            setTimeout(init, 60);
+            setTimeout(init, 100);
           </script>
         </body>
       </html>
     `;
-
     return htmlContent;
-  }, [code, pauseOnIdle]);
+  }, [code]);
 
   return (
-    <div
-      className={`relative rounded-lg overflow-hidden border border-border bg-muted/30 ${className}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className={`relative rounded-lg overflow-hidden border border-border bg-muted/30 ${className}`}>
       <iframe
-        ref={iframeRef}
         srcDoc={previewHtml}
         className="absolute inset-0 w-full h-full"
         sandbox="allow-scripts"

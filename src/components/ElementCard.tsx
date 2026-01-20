@@ -23,7 +23,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
 
       {/* Code Preview */}
       <div className="relative aspect-video overflow-hidden bg-muted/30">
-        <CodePreview code={element.code} className="w-full h-full" pauseOnIdle />
+        <CodePreview code={element.code} className="w-full h-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
       </div>
 
