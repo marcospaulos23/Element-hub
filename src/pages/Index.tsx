@@ -96,10 +96,10 @@ const Index = () => {
             <Hero />
 
             {/* Elements Section */}
-            <section id="elements" className="pt-4 pb-12 px-4 md:px-8">
+            <section id="elements" className="pt-16 pb-12 px-4 md:px-8">
               <div className="max-w-7xl mx-auto">
                 {/* Category Filter */}
-                <div className="mb-10">
+                <div className="mb-16">
                   <CategoryFilter
                     categories={categories}
                     activeCategory={activeCategory}
