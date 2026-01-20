@@ -3,18 +3,13 @@ import { Sparkles } from "lucide-react";
 const Hero = () => {
   return (
     <section className="relative pt-16 pb-8 px-4 text-center">
-      {/* Large background glow effect - full screen */}
-      <div className="fixed inset-0 pointer-events-none -z-10">
+      {/* Large circular glow effect - soft white to black gradient */}
+      <div className="fixed inset-0 pointer-events-none -z-10 flex items-start justify-center">
         <div 
-          className="absolute inset-0"
+          className="w-[1200px] h-[1200px] rounded-full"
           style={{
-            background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 40%, transparent 70%)',
-          }}
-        />
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse 60% 40% at 30% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 50%)',
+            marginTop: '-200px',
+            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 30%, rgba(0, 0, 0, 0) 60%)',
           }}
         />
       </div>
