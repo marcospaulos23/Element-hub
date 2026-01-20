@@ -2,7 +2,7 @@ import { Sparkles } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative pt-16 pb-8 px-4 text-center">
+    <section className="relative pt-8 pb-8 px-4 text-center">
       {/* Large circular glow effect - soft white to black gradient */}
       <div className="fixed inset-0 pointer-events-none -z-10 flex items-start justify-center">
         <div 
