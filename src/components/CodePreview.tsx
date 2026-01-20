@@ -112,9 +112,18 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const totalW = maxR - minL;
               const totalH = maxB - minT;
               
-              // Centro do conteúdo animado
-              const contentCx = minL + totalW / 2;
-              const contentCy = minT + totalH / 2;
+              // Aplicar escala de 0.7 para deixar menor
+              content.style.transform = 'scale(0.7)';
+              content.style.transformOrigin = 'center center';
+              
+              await new Promise(r => requestAnimationFrame(r));
+              
+              // Remedir após escala
+              const scaledBounds = getAllBounds(content);
+              
+              // Centro do conteúdo escalado
+              const contentCx = scaledBounds.cx;
+              const contentCy = scaledBounds.cy;
               
               // Centro da tela
               const screenCx = window.innerWidth / 2;
