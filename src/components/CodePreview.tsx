@@ -39,9 +39,8 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               padding: 16px;
             }
             .preview-content {
-              max-width: 100%;
-              max-height: 100%;
               transform-origin: center center;
+              transition: transform 0.2s ease;
             }
             @keyframes spin {
               to { transform: rotate(360deg); }
@@ -76,10 +75,45 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
         </head>
         <body>
           <div class="preview-wrapper">
-            <div class="preview-content">
+            <div class="preview-content" id="content">
               ${code}
             </div>
           </div>
+          <script>
+            function scaleContent() {
+              const wrapper = document.querySelector('.preview-wrapper');
+              const content = document.getElementById('content');
+              if (!wrapper || !content) return;
+              
+              // Reset scale first
+              content.style.transform = 'scale(1)';
+              
+              const wrapperRect = wrapper.getBoundingClientRect();
+              const contentRect = content.getBoundingClientRect();
+              
+              const availableWidth = wrapperRect.width - 32;
+              const availableHeight = wrapperRect.height - 32;
+              
+              const scaleX = availableWidth / contentRect.width;
+              const scaleY = availableHeight / contentRect.height;
+              
+              const scale = Math.min(scaleX, scaleY, 1);
+              
+              if (scale < 1) {
+                content.style.transform = 'scale(' + scale + ')';
+              }
+            }
+            
+            // Run on load and resize
+            window.addEventListener('load', function() {
+              setTimeout(scaleContent, 100);
+            });
+            window.addEventListener('resize', scaleContent);
+            
+            // Also run after a short delay for dynamic content
+            setTimeout(scaleContent, 200);
+            setTimeout(scaleContent, 500);
+          </script>
         </body>
       </html>
     `;
