@@ -14,15 +14,34 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
         <head>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
-            body {
+            * {
+              box-sizing: border-box;
+            }
+            html, body {
               margin: 0;
-              padding: 16px;
+              padding: 0;
+              width: 100%;
+              height: 100%;
+              background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+              overflow: hidden;
+            }
+            body {
               display: flex;
               align-items: center;
               justify-content: center;
-              min-height: 100vh;
-              background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-              overflow: hidden;
+            }
+            .preview-wrapper {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              height: 100%;
+              padding: 16px;
+            }
+            .preview-content {
+              max-width: 100%;
+              max-height: 100%;
+              transform-origin: center center;
             }
             @keyframes spin {
               to { transform: rotate(360deg); }
@@ -33,16 +52,34 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
                 opacity: 0;
               }
             }
+            @keyframes pulse {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.5; }
+            }
+            @keyframes bounce {
+              0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+              50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+            }
             .animate-spin {
               animation: spin 1s linear infinite;
             }
             .animate-ping {
               animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
             }
+            .animate-pulse {
+              animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            .animate-bounce {
+              animation: bounce 1s infinite;
+            }
           </style>
         </head>
         <body>
-          ${code}
+          <div class="preview-wrapper">
+            <div class="preview-content">
+              ${code}
+            </div>
+          </div>
         </body>
       </html>
     `;
