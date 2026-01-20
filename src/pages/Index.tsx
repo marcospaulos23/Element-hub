@@ -29,7 +29,10 @@ const Index = () => {
 
   const filteredElements = useMemo(() => {
     if (activeCategory === "Todos") return elements;
-    return elements.filter((el) => el.category === activeCategory);
+    return elements.filter((el) => {
+      const cats = Array.isArray(el.category) ? el.category : [el.category];
+      return cats.includes(activeCategory);
+    });
   }, [activeCategory, elements]);
 
   const handleElementClick = (element: UIElement) => {
