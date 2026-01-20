@@ -39,10 +39,10 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
           </div>
         </DialogHeader>
 
-        {/* Main Content - Code and Image side by side */}
-        <div className="flex flex-col lg:flex-row gap-6 p-6">
+        {/* Main Content - Code and Preview side by side 50/50 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
           {/* Code Section */}
-          <div className="flex-1 min-w-0">
+          <div className="flex flex-col">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-muted-foreground">Código do componente</span>
               <button
@@ -63,8 +63,8 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
               </button>
             </div>
             
-            <div className="relative rounded-lg bg-code-bg border border-border overflow-hidden">
-              <pre className="p-4 overflow-x-auto max-h-[400px]">
+            <div className="relative rounded-lg bg-code-bg border border-border overflow-hidden flex-1">
+              <pre className="p-4 overflow-auto h-[250px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full">
                 <code className="text-sm font-mono text-foreground/90 leading-relaxed">
                   {element.code}
                 </code>
@@ -73,11 +73,11 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
           </div>
 
           {/* Preview Section */}
-          <div className="flex-1 min-w-0">
+          <div className="flex flex-col">
             <div className="mb-3">
               <span className="text-sm font-medium text-muted-foreground">Preview</span>
             </div>
-            <div className="relative h-[300px] rounded-lg overflow-hidden border border-border bg-zinc-800/50 flex items-center justify-center">
+            <div className="relative h-[250px] rounded-lg overflow-hidden border border-border bg-zinc-800/50 flex items-center justify-center flex-1">
               {hasPreviewImage ? (
                 <img 
                   src={element.preview_image!} 
