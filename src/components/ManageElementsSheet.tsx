@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { UIElement } from "@/hooks/useElements";
 import {
   Sheet,
@@ -19,6 +20,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import CodePreview from "./CodePreview";
 
 interface ManageElementsSheetProps {
   isOpen: boolean;
@@ -35,6 +44,20 @@ const ManageElementsSheet = ({
   onEditElement,
   onDeleteElement,
 }: ManageElementsSheetProps) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  // Get unique categories
+  const categories = useMemo(() => {
+    const cats = [...new Set(elements.map((el) => el.category))];
+    return cats.sort();
+  }, [elements]);
+
+  // Filter elements by category
+  const filteredElements = useMemo(() => {
+    if (selectedCategory === "all") return elements;
+    return elements.filter((el) => el.category === selectedCategory);
+  }, [elements, selectedCategory]);
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-[400px] sm:w-[540px]">
@@ -45,19 +68,36 @@ const ManageElementsSheet = ({
           </SheetDescription>
         </SheetHeader>
 
-        <ScrollArea className="h-[calc(100vh-120px)] mt-6 pr-4">
+        {/* Category Filter */}
+        <div className="mt-4">
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filtrar por categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as categorias</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <ScrollArea className="h-[calc(100vh-180px)] mt-4 pr-4">
           <div className="space-y-2">
-            {elements.length === 0 ? (
+            {filteredElements.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
-                Nenhum elemento cadastrado
+                Nenhum elemento encontrado
               </p>
             ) : (
-              elements.map((element) => (
+              filteredElements.map((element) => (
                 <div
                   key={element.id}
                   className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                 >
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 mr-3">
                     <h4 className="font-medium text-foreground truncate">
                       {element.name}
                     </h4>
@@ -66,7 +106,12 @@ const ManageElementsSheet = ({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 ml-4">
+                  {/* Element Preview */}
+                  <div className="w-16 h-12 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0">
+                    <CodePreview code={element.code} className="w-full h-full scale-50 origin-center" />
+                  </div>
+
+                  <div className="flex items-center gap-1 ml-3">
                     <button
                       onClick={() => {
                         onEditElement(element);
