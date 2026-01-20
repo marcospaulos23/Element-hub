@@ -154,12 +154,13 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               // Give layout a frame
               await nextFrame();
 
-              // Measure max animated bounds over ~0.9s (covers ping/bounce etc.)
-              const maxRect = await sampleMaxRect(content, 900);
+              // Measure max animated bounds over ~2.2s (cobre a maioria dos loops de animação)
+              const maxRect = await sampleMaxRect(content, 2200);
               const wrapperRect = wrapper.getBoundingClientRect();
 
-              const availableWidth = wrapperRect.width;
-              const availableHeight = wrapperRect.height;
+              const margin = 12;
+              const availableWidth = Math.max(1, wrapperRect.width - margin * 2);
+              const availableHeight = Math.max(1, wrapperRect.height - margin * 2);
 
               const w = Math.max(1, maxRect.width);
               const h = Math.max(1, maxRect.height);
@@ -173,9 +174,32 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const wrapperCx = wrapperRect.left + wrapperRect.width / 2;
               const wrapperCy = wrapperRect.top + wrapperRect.height / 2;
 
-              const dx = wrapperCx - scaledRect.cx;
-              const dy = wrapperCy - scaledRect.cy;
+              let dx = wrapperCx - scaledRect.cx;
+              let dy = wrapperCy - scaledRect.cy;
               transformer.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+
+              // Ajuste fino para garantir que NENHUM lado fique cortado
+              await nextFrame();
+              const finalRect = unionRectFor(content);
+
+              let adjustX = 0;
+              let adjustY = 0;
+
+              const leftLimit = wrapperRect.left + margin;
+              const rightLimit = wrapperRect.right - margin;
+              const topLimit = wrapperRect.top + margin;
+              const bottomLimit = wrapperRect.bottom - margin;
+
+              if (finalRect.left < leftLimit) adjustX += (leftLimit - finalRect.left);
+              if (finalRect.right > rightLimit) adjustX -= (finalRect.right - rightLimit);
+              if (finalRect.top < topLimit) adjustY += (topLimit - finalRect.top);
+              if (finalRect.bottom > bottomLimit) adjustY -= (finalRect.bottom - bottomLimit);
+
+              if (adjustX !== 0 || adjustY !== 0) {
+                dx += adjustX;
+                dy += adjustY;
+                transformer.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+              }
             }
 
             // Run multiple times to catch dynamic rendering/animations
