@@ -85,14 +85,14 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               };
             }
 
-            async function centerContent() {
+            async function centerAndFit() {
               const mover = document.getElementById('mover');
               const content = document.getElementById('content');
               if (!mover || !content) return;
 
               // Reset para medir tamanho real
               mover.style.transform = 'translate(0, 0)';
-              content.style.transform = 'none';
+              content.style.transform = 'scale(1)';
               
               await new Promise(r => requestAnimationFrame(r));
 
@@ -112,33 +112,59 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const totalW = maxR - minL;
               const totalH = maxB - minT;
               
-              // Aplicar escala de 0.7 para deixar menor
-              content.style.transform = 'scale(0.7)';
+              // Tamanho do viewport (preview box)
+              const viewW = window.innerWidth;
+              const viewH = window.innerHeight;
+              const padding = 20; // margem de segurança
+              
+              // Calcular escala necessária para caber no preview
+              const availableW = viewW - padding;
+              const availableH = viewH - padding;
+              
+              let scale = 1;
+              if (totalW > availableW || totalH > availableH) {
+                const scaleX = availableW / totalW;
+                const scaleY = availableH / totalH;
+                scale = Math.min(scaleX, scaleY);
+              }
+              
+              // Aplicar escala apenas se necessário
+              content.style.transform = 'scale(' + scale + ')';
               content.style.transformOrigin = 'center center';
               
               await new Promise(r => requestAnimationFrame(r));
               
-              // Remedir após escala
-              const scaledBounds = getAllBounds(content);
+              // Remedir bounds após escala para centralizar corretamente
+              let sMinL = Infinity, sMinT = Infinity, sMaxR = -Infinity, sMaxB = -Infinity;
+              const start2 = performance.now();
               
-              // Centro do conteúdo escalado
-              const contentCx = scaledBounds.cx;
-              const contentCy = scaledBounds.cy;
+              while (performance.now() - start2 < 500) {
+                const b = getAllBounds(content);
+                sMinL = Math.min(sMinL, b.left);
+                sMinT = Math.min(sMinT, b.top);
+                sMaxR = Math.max(sMaxR, b.right);
+                sMaxB = Math.max(sMaxB, b.bottom);
+                await new Promise(r => requestAnimationFrame(r));
+              }
               
-              // Centro da tela
-              const screenCx = window.innerWidth / 2;
-              const screenCy = window.innerHeight / 2;
+              // Centro do conteúdo escalado (considerando toda a animação)
+              const contentCx = (sMinL + sMaxR) / 2;
+              const contentCy = (sMinT + sMaxB) / 2;
               
-              // Mover para centralizar
+              // Centro exato da tela
+              const screenCx = viewW / 2;
+              const screenCy = viewH / 2;
+              
+              // Mover para centralizar exatamente no meio
               const moveX = screenCx - contentCx;
               const moveY = screenCy - contentCy;
               
               mover.style.transform = 'translate(' + moveX + 'px, ' + moveY + 'px)';
             }
 
-            window.addEventListener('load', centerContent);
-            setTimeout(centerContent, 50);
-            setTimeout(centerContent, 200);
+            window.addEventListener('load', centerAndFit);
+            setTimeout(centerAndFit, 50);
+            setTimeout(centerAndFit, 200);
           </script>
         </body>
       </html>
