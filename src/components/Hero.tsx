@@ -2,7 +2,7 @@ import { Sparkles } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative pt-12 pb-16 px-4 text-center">
+    <section className="relative pt-16 pb-24 px-4 text-center">
       {/* Large circular glow effect - soft white to black gradient */}
       <div className="fixed inset-0 pointer-events-none -z-10 flex items-start justify-center">
         <div 
@@ -20,11 +20,11 @@ const Hero = () => {
           <span>+50 elementos prontos para usar</span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 animate-fade-in" style={{ animationDelay: "100ms" }}>
           <span className="gradient-text">Element Hub</span>
         </h1>
 
-        <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto mb-10 animate-fade-in leading-relaxed" style={{ animationDelay: "200ms" }}>
+        <p className="text-2xl text-muted-foreground font-light max-w-2xl mx-auto mb-10 animate-fade-in leading-relaxed" style={{ animationDelay: "200ms" }}>
           Explore nossa coleção de componentes UI modernos. Veja em ação e copie o código
           para usar em seus projetos.
         </p>
