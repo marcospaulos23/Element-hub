@@ -8,13 +8,13 @@ const Hero = () => {
         <div 
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 80% 50% at 50% 30%, hsl(var(--primary) / 0.15) 0%, hsl(var(--primary) / 0.05) 40%, transparent 70%)',
+            background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 40%, transparent 70%)',
           }}
         />
         <div 
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 60% 40% at 30% 20%, hsl(var(--accent) / 0.08) 0%, transparent 50%)',
+            background: 'radial-gradient(ellipse 60% 40% at 30% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 50%)',
           }}
         />
       </div>
