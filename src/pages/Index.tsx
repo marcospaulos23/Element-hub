@@ -8,6 +8,7 @@ import CodeModal from "@/components/CodeModal";
 import AddElementModal from "@/components/AddElementModal";
 import AddCategoryModal from "@/components/AddCategoryModal";
 import EditElementModal from "@/components/EditElementModal";
+import ManageElementsSheet from "@/components/ManageElementsSheet";
 import { categories as initialCategories } from "@/data/elements";
 import { useElements, UIElement } from "@/hooks/useElements";
 import { Plus } from "lucide-react";
@@ -20,6 +21,7 @@ const Index = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isManageSheetOpen, setIsManageSheetOpen] = useState(false);
   const [elementToEdit, setElementToEdit] = useState<UIElement | null>(null);
   const [categories, setCategories] = useState<string[]>(initialCategories);
 
@@ -69,7 +71,10 @@ const Index = () => {
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         {/* Sidebar */}
-        <AppSidebar onAddCategory={() => setIsAddCategoryModalOpen(true)} />
+        <AppSidebar 
+          onAddCategory={() => setIsAddCategoryModalOpen(true)} 
+          onManageElements={() => setIsManageSheetOpen(true)}
+        />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
@@ -168,6 +173,13 @@ const Index = () => {
           onSave={handleSaveEdit}
           element={elementToEdit}
           categories={categories}
+        />
+        <ManageElementsSheet
+          isOpen={isManageSheetOpen}
+          onClose={() => setIsManageSheetOpen(false)}
+          elements={elements}
+          onEditElement={handleEditElement}
+          onDeleteElement={handleDeleteElement}
         />
       </div>
     </SidebarProvider>
