@@ -1,11 +1,29 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 
 interface CodePreviewProps {
   code: string;
   className?: string;
+  pauseOnIdle?: boolean;
 }
 
-const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
+const CodePreview = ({ code, className = "", pauseOnIdle = false }: CodePreviewProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // Comunicar com o iframe sobre o estado de pausa
+  useEffect(() => {
+    if (!pauseOnIdle) return;
+    
+    const iframe = iframeRef.current;
+    if (!iframe?.contentWindow) return;
+    
+    try {
+      iframe.contentWindow.postMessage({ type: 'SET_PAUSED', paused: !isHovered }, '*');
+    } catch (e) {
+      // Ignore cross-origin errors
+    }
+  }, [isHovered, pauseOnIdle]);
+
   const previewHtml = useMemo(() => {
     const htmlContent = `
       <!DOCTYPE html>
@@ -45,9 +63,15 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
             .animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
             .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
             .animate-bounce { animation: bounce 1s infinite; }
+            
+            /* Estado pausado */
+            body.paused * {
+              animation-play-state: paused !important;
+              transition: none !important;
+            }
           </style>
         </head>
-        <body>
+        <body class="${pauseOnIdle ? 'paused' : ''}">
           <div id="container">
             <div id="scaler">
               <div id="content">
@@ -57,6 +81,9 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
           </div>
 
           <script>
+            let isPaused = ${pauseOnIdle ? 'true' : 'false'};
+            let rafId = null;
+            
             function getAllBounds(el) {
               let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
               
@@ -100,6 +127,9 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               // Reset
               container.style.transform = 'translate(-50%, -50%)';
               scaler.style.transform = 'scale(1)';
+              
+              // Temporariamente despausar para medir
+              document.body.classList.remove('paused');
               
               await new Promise(r => requestAnimationFrame(r));
 
@@ -146,9 +176,19 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               // Calcular offset para centralizar o centro da animação no centro da tela
               offsetX = screenCx - animCx;
               offsetY = screenCy - animCy;
+              
+              // Restaurar estado pausado se necessário
+              if (isPaused) {
+                document.body.classList.add('paused');
+              }
             }
 
             function keepCentered() {
+              if (isPaused) {
+                rafId = requestAnimationFrame(keepCentered);
+                return;
+              }
+              
               const container = document.getElementById('container');
               const content = document.getElementById('content');
               if (!container || !content) return;
@@ -163,8 +203,20 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               
               container.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
               
-              requestAnimationFrame(keepCentered);
+              rafId = requestAnimationFrame(keepCentered);
             }
+
+            // Escutar mensagens do React
+            window.addEventListener('message', (e) => {
+              if (e.data && e.data.type === 'SET_PAUSED') {
+                isPaused = e.data.paused;
+                if (isPaused) {
+                  document.body.classList.add('paused');
+                } else {
+                  document.body.classList.remove('paused');
+                }
+              }
+            });
 
             async function init() {
               await measureAndFit();
@@ -178,11 +230,16 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
       </html>
     `;
     return htmlContent;
-  }, [code]);
+  }, [code, pauseOnIdle]);
 
   return (
-    <div className={`relative rounded-lg overflow-hidden border border-border bg-muted/30 ${className}`}>
+    <div 
+      className={`relative rounded-lg overflow-hidden border border-border bg-muted/30 ${className}`}
+      onMouseEnter={() => pauseOnIdle && setIsHovered(true)}
+      onMouseLeave={() => pauseOnIdle && setIsHovered(false)}
+    >
       <iframe
+        ref={iframeRef}
         srcDoc={previewHtml}
         className="absolute inset-0 w-full h-full"
         sandbox="allow-scripts"
