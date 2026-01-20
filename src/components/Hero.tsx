@@ -3,10 +3,24 @@ import { Sparkles } from "lucide-react";
 const Hero = () => {
   return (
     <section className="relative pt-16 pb-8 px-4 text-center">
-      {/* Background effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-accent/5 rounded-full blur-3xl" />
+      {/* Background effects - positioned to extend beyond section bounds */}
+      <div className="absolute inset-0 pointer-events-none" style={{ overflow: 'visible' }}>
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full blur-[120px]"
+          style={{
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'radial-gradient(circle, hsl(var(--primary) / 0.08) 0%, transparent 70%)',
+          }}
+        />
+        <div 
+          className="absolute w-[400px] h-[400px] rounded-full blur-[100px]"
+          style={{
+            top: '20%',
+            left: '30%',
+            background: 'radial-gradient(circle, hsl(var(--accent) / 0.06) 0%, transparent 70%)',
+          }}
+        />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto">
