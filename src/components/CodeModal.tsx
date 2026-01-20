@@ -77,12 +77,12 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
             <div className="mb-3">
               <span className="text-sm font-medium text-muted-foreground">Preview</span>
             </div>
-            <div className="relative aspect-video rounded-lg overflow-hidden border border-border bg-muted/30">
+            <div className="relative h-[300px] rounded-lg overflow-hidden border border-border bg-zinc-800/50 flex items-center justify-center">
               {hasPreviewImage ? (
                 <img 
                   src={element.preview_image!} 
                   alt={element.name}
-                  className="w-full h-full object-contain"
+                  className="max-w-full max-h-full object-contain"
                 />
               ) : (
                 <CodePreview code={element.code} className="w-full h-full" />
