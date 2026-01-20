@@ -14,13 +14,9 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
         <head>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
-            * {
-              transform: scale(0.85);
-              transform-origin: center center;
-            }
             body {
               margin: 0;
-              padding: 12px;
+              padding: 16px;
               display: flex;
               align-items: center;
               justify-content: center;
