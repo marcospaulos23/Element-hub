@@ -90,7 +90,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
     <div className={`relative rounded-lg overflow-hidden border border-border bg-muted/30 ${className}`}>
       <iframe
         srcDoc={previewHtml}
-        className="w-full h-full"
+        className="absolute inset-0 w-full h-full"
         sandbox="allow-scripts"
         title="Preview do elemento"
       />
