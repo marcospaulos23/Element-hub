@@ -9,8 +9,8 @@ import AddElementModal from "@/components/AddElementModal";
 import AddCategoryModal from "@/components/AddCategoryModal";
 import EditElementModal from "@/components/EditElementModal";
 import ManageElementsSheet from "@/components/ManageElementsSheet";
-import { categories as initialCategories } from "@/data/elements";
 import { useElements, UIElement } from "@/hooks/useElements";
+import { useCategories } from "@/hooks/useCategories";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -23,9 +23,14 @@ const Index = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isManageSheetOpen, setIsManageSheetOpen] = useState(false);
   const [elementToEdit, setElementToEdit] = useState<UIElement | null>(null);
-  const [categories, setCategories] = useState<string[]>(initialCategories);
 
   const { elements, loading, addElement, updateElement, deleteElement } = useElements();
+  const { categories: categoriesData, addCategory } = useCategories();
+
+  // Map categories to string array with "Todos" as first item
+  const categoryNames = useMemo(() => {
+    return ["Todos", ...categoriesData.map(c => c.name)];
+  }, [categoriesData]);
 
   const filteredElements = useMemo(() => {
     if (activeCategory === "Todos") return elements;
@@ -49,10 +54,8 @@ const Index = () => {
     await addElement(newElement);
   };
 
-  const handleAddCategory = (categoryName: string) => {
-    if (!categories.includes(categoryName)) {
-      setCategories((prev) => [...prev, categoryName]);
-    }
+  const handleAddCategory = async (categoryName: string) => {
+    await addCategory(categoryName);
   };
 
   const handleDeleteElement = async (id: string) => {
@@ -104,7 +107,7 @@ const Index = () => {
                 {/* Category Filter */}
                 <div className="mb-16">
                   <CategoryFilter
-                    categories={categories}
+                    categories={categoryNames}
                     activeCategory={activeCategory}
                     onCategoryChange={setActiveCategory}
                   />
@@ -160,7 +163,7 @@ const Index = () => {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onAdd={handleAddElement}
-          categories={categories}
+          categories={categoryNames.filter(c => c !== "Todos")}
         />
         <AddCategoryModal
           isOpen={isAddCategoryModalOpen}
@@ -175,7 +178,7 @@ const Index = () => {
           }}
           onSave={handleSaveEdit}
           element={elementToEdit}
-          categories={categories}
+          categories={categoryNames.filter(c => c !== "Todos")}
         />
         <ManageElementsSheet
           isOpen={isManageSheetOpen}
