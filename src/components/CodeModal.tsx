@@ -64,7 +64,7 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
             </div>
             
             <div className="relative rounded-lg bg-code-bg border border-border overflow-hidden h-[280px]">
-              <pre className="p-4 overflow-auto h-full w-full [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full">
+              <pre className="p-4 overflow-auto h-full w-full [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-zinc-900 [&::-webkit-scrollbar-thumb]:bg-zinc-600 [&::-webkit-scrollbar-thumb]:rounded-full">
                 <code className="text-sm font-mono text-foreground/90 leading-relaxed whitespace-pre">
                   {element.code}
                 </code>
