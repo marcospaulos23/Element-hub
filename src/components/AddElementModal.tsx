@@ -64,7 +64,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl bg-popover border-border max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-600 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full">
+      <DialogContent className="max-w-4xl bg-popover border-border max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-button]:bg-zinc-500 [&::-webkit-scrollbar-button]:h-3 [&::-webkit-scrollbar-button:vertical:decrement]:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2352525b%22><path d=%22M12 8l-6 6h12z%22/></svg>')] [&::-webkit-scrollbar-button:vertical:decrement]:bg-center [&::-webkit-scrollbar-button:vertical:decrement]:bg-no-repeat [&::-webkit-scrollbar-button:vertical:increment]:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2352525b%22><path d=%22M12 16l-6-6h12z%22/></svg>')] [&::-webkit-scrollbar-button:vertical:increment]:bg-center [&::-webkit-scrollbar-button:vertical:increment]:bg-no-repeat">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary" />
