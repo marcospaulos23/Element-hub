@@ -36,11 +36,10 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               justify-content: center;
               width: 100%;
               height: 100%;
-              padding: 16px;
+              padding: 24px;
             }
             .preview-content {
               transform-origin: center center;
-              transition: transform 0.2s ease;
             }
             @keyframes spin {
               to { transform: rotate(360deg); }
@@ -80,6 +79,39 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
             </div>
           </div>
           <script>
+            function getMaxAnimatedSize(element) {
+              // Get computed styles to detect animations
+              const styles = window.getComputedStyle(element);
+              const animation = styles.animation || styles.webkitAnimation || '';
+              
+              let maxScale = 1;
+              
+              // Check for ping animation (scales to 2x)
+              if (animation.includes('ping')) {
+                maxScale = Math.max(maxScale, 2);
+              }
+              
+              // Check for bounce animation (moves up 25%)
+              if (animation.includes('bounce')) {
+                maxScale = Math.max(maxScale, 1.25);
+              }
+              
+              // Check all children for animations too
+              element.querySelectorAll('*').forEach(child => {
+                const childStyles = window.getComputedStyle(child);
+                const childAnimation = childStyles.animation || childStyles.webkitAnimation || '';
+                
+                if (childAnimation.includes('ping')) {
+                  maxScale = Math.max(maxScale, 2);
+                }
+                if (childAnimation.includes('bounce')) {
+                  maxScale = Math.max(maxScale, 1.25);
+                }
+              });
+              
+              return maxScale;
+            }
+            
             function scaleContent() {
               const wrapper = document.querySelector('.preview-wrapper');
               const content = document.getElementById('content');
@@ -91,28 +123,39 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const wrapperRect = wrapper.getBoundingClientRect();
               const contentRect = content.getBoundingClientRect();
               
-              const availableWidth = wrapperRect.width - 32;
-              const availableHeight = wrapperRect.height - 32;
+              // Get available space (with padding)
+              const availableWidth = wrapperRect.width - 48;
+              const availableHeight = wrapperRect.height - 48;
               
-              const scaleX = availableWidth / contentRect.width;
-              const scaleY = availableHeight / contentRect.height;
+              // Get the max animation scale factor
+              const animationScale = getMaxAnimatedSize(content);
               
-              const scale = Math.min(scaleX, scaleY, 1);
+              // Calculate the effective size including animation expansion
+              const effectiveWidth = contentRect.width * animationScale;
+              const effectiveHeight = contentRect.height * animationScale;
               
-              if (scale < 1) {
-                content.style.transform = 'scale(' + scale + ')';
-              }
+              // Calculate scale needed
+              const scaleX = availableWidth / effectiveWidth;
+              const scaleY = availableHeight / effectiveHeight;
+              
+              let scale = Math.min(scaleX, scaleY, 1);
+              
+              // Apply scale
+              content.style.transform = 'scale(' + scale + ')';
             }
             
             // Run on load and resize
             window.addEventListener('load', function() {
               setTimeout(scaleContent, 100);
+              setTimeout(scaleContent, 300);
             });
             window.addEventListener('resize', scaleContent);
             
-            // Also run after a short delay for dynamic content
+            // Run multiple times to catch dynamic content
+            setTimeout(scaleContent, 50);
             setTimeout(scaleContent, 200);
             setTimeout(scaleContent, 500);
+            setTimeout(scaleContent, 1000);
           </script>
         </body>
       </html>
