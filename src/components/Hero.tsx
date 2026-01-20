@@ -20,7 +20,7 @@ const Hero = () => {
           <span>+50 elementos prontos para usar</span>
         </div>
 
-        <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <h1 className="text-6xl md:text-8xl font-normal tracking-tight mb-8 animate-fade-in" style={{ animationDelay: "100ms", fontFamily: "'Fraunces', serif" }}>
           <span className="gradient-text">Element Hub</span>
         </h1>
 
