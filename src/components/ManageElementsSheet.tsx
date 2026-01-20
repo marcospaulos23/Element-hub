@@ -95,22 +95,22 @@ const ManageElementsSheet = ({
               filteredElements.map((element) => (
                 <div
                   key={element.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                  className="flex items-center p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                 >
-                  <div className="flex-1 min-w-0 mr-3">
+                  {/* Element Preview - Static thumbnail on LEFT */}
+                  <div className="w-12 h-10 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0 flex items-center justify-center mr-3">
+                    <div className="w-[120px] h-[100px] transform scale-[0.1] origin-center">
+                      <CodePreview code={element.code} className="w-full h-full !border-0" />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-foreground truncate">
                       {element.name}
                     </h4>
                     <p className="text-sm text-muted-foreground truncate">
                       {element.category}
                     </p>
-                  </div>
-
-                  {/* Element Preview - Static thumbnail */}
-                  <div className="w-14 h-10 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0 flex items-center justify-center">
-                    <div className="w-[140px] h-[100px] transform scale-[0.1] origin-center">
-                      <CodePreview code={element.code} className="w-full h-full !border-0" />
-                    </div>
                   </div>
 
                   <div className="flex items-center gap-1 ml-3">
