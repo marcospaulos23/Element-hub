@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UIElement } from "@/data/elements";
+import { UIElement } from "@/hooks/useElements";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Check, Copy } from "lucide-react";
 import CodePreview from "./CodePreview";

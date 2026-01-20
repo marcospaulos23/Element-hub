@@ -25,15 +25,6 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       <div className="relative aspect-video overflow-hidden bg-muted/30">
         <CodePreview code={element.code} className="w-full h-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
-        
-        {/* Code overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <div className="w-14 h-14 rounded-full bg-foreground/90 flex items-center justify-center backdrop-blur-sm">
-            <svg className="w-6 h-6 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-            </svg>
-          </div>
-        </div>
       </div>
 
       {/* Info */}

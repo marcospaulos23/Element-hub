@@ -7,7 +7,9 @@ import CategoryFilter from "@/components/CategoryFilter";
 import CodeModal from "@/components/CodeModal";
 import AddElementModal from "@/components/AddElementModal";
 import AddCategoryModal from "@/components/AddCategoryModal";
-import { elements as initialElements, categories as initialCategories, UIElement } from "@/data/elements";
+import EditElementModal from "@/components/EditElementModal";
+import { categories as initialCategories } from "@/data/elements";
+import { useElements, UIElement } from "@/hooks/useElements";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,8 +19,11 @@ const Index = () => {
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
-  const [elements, setElements] = useState<UIElement[]>(initialElements);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [elementToEdit, setElementToEdit] = useState<UIElement | null>(null);
   const [categories, setCategories] = useState<string[]>(initialCategories);
+
+  const { elements, loading, addElement, updateElement, deleteElement } = useElements();
 
   const filteredElements = useMemo(() => {
     if (activeCategory === "Todos") return elements;
@@ -35,12 +40,8 @@ const Index = () => {
     setTimeout(() => setSelectedElement(null), 200);
   };
 
-  const handleAddElement = (newElement: Omit<UIElement, "id">) => {
-    const element: UIElement = {
-      ...newElement,
-      id: String(Date.now()),
-    };
-    setElements((prev) => [element, ...prev]);
+  const handleAddElement = async (newElement: Omit<UIElement, "id">) => {
+    await addElement(newElement);
   };
 
   const handleAddCategory = (categoryName: string) => {
@@ -49,11 +50,31 @@ const Index = () => {
     }
   };
 
+  const handleDeleteElement = async (id: string) => {
+    await deleteElement(id);
+  };
+
+  const handleEditElement = (element: UIElement) => {
+    setElementToEdit(element);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (id: string, updates: Partial<Omit<UIElement, "id">>) => {
+    await updateElement(id, updates);
+    setIsEditModalOpen(false);
+    setElementToEdit(null);
+  };
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         {/* Sidebar */}
-        <AppSidebar onAddCategory={() => setIsAddCategoryModalOpen(true)} />
+        <AppSidebar 
+          onAddCategory={() => setIsAddCategoryModalOpen(true)} 
+          elements={elements}
+          onDeleteElement={handleDeleteElement}
+          onEditElement={handleEditElement}
+        />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
@@ -86,19 +107,28 @@ const Index = () => {
                   />
                 </div>
 
+                {/* Loading State */}
+                {loading && (
+                  <div className="flex items-center justify-center py-20">
+                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+
                 {/* Elements Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredElements.map((element) => (
-                    <ElementCard
-                      key={element.id}
-                      element={element}
-                      onClick={() => handleElementClick(element)}
-                    />
-                  ))}
-                </div>
+                {!loading && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filteredElements.map((element) => (
+                      <ElementCard
+                        key={element.id}
+                        element={element}
+                        onClick={() => handleElementClick(element)}
+                      />
+                    ))}
+                  </div>
+                )}
 
                 {/* Empty State */}
-                {filteredElements.length === 0 && (
+                {!loading && filteredElements.length === 0 && (
                   <div className="text-center py-20 px-4">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                       <span className="text-2xl">🔍</span>
@@ -133,6 +163,16 @@ const Index = () => {
           isOpen={isAddCategoryModalOpen}
           onClose={() => setIsAddCategoryModalOpen(false)}
           onAdd={handleAddCategory}
+        />
+        <EditElementModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setElementToEdit(null);
+          }}
+          onSave={handleSaveEdit}
+          element={elementToEdit}
+          categories={categories}
         />
       </div>
     </SidebarProvider>
