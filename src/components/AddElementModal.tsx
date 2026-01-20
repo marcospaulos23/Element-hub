@@ -121,12 +121,14 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
             </div>
 
             {/* Right Column - Live Preview */}
-            <div className="space-y-2">
+            <div className="space-y-2 overflow-hidden">
               <Label className="text-foreground">Preview ao Vivo</Label>
-              <CodePreview 
-                code={code} 
-                className="aspect-video min-h-[300px]"
-              />
+              <div className="overflow-hidden rounded-lg border border-border">
+                <CodePreview 
+                  code={code} 
+                  className="aspect-video min-h-[300px] max-h-[350px]"
+                />
+              </div>
               <p className="text-xs text-muted-foreground">
                 O preview será atualizado conforme você digita o código
               </p>
