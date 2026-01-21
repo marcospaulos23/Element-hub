@@ -55,6 +55,34 @@ export const useCategories = () => {
     }
   };
 
+  const updateCategory = async (id: string, name: string, description?: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .update({ name, description: description || null })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.error('Já existe uma categoria com este nome');
+          return null;
+        }
+        throw error;
+      }
+      setCategories((prev) => 
+        prev.map((cat) => cat.id === id ? data : cat).sort((a, b) => a.name.localeCompare(b.name))
+      );
+      toast.success('Categoria atualizada com sucesso!');
+      return data;
+    } catch (error) {
+      console.error('Error updating category:', error);
+      toast.error('Erro ao atualizar categoria');
+      return null;
+    }
+  };
+
   const deleteCategory = async (id: string) => {
     try {
       const { error } = await supabase
@@ -81,6 +109,7 @@ export const useCategories = () => {
     categories,
     loading: loading,
     addCategory,
+    updateCategory,
     deleteCategory,
     refetch: fetchCategories,
   };

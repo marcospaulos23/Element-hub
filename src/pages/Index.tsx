@@ -8,9 +8,11 @@ import CodeModal from "@/components/CodeModal";
 import AddElementModal from "@/components/AddElementModal";
 import AddCategoryModal from "@/components/AddCategoryModal";
 import EditElementModal from "@/components/EditElementModal";
+import EditCategoryModal from "@/components/EditCategoryModal";
 import ManageElementsSheet from "@/components/ManageElementsSheet";
+import ManageCategoriesSheet from "@/components/ManageCategoriesSheet";
 import { useElements, UIElement } from "@/hooks/useElements";
-import { useCategories } from "@/hooks/useCategories";
+import { useCategories, Category } from "@/hooks/useCategories";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -23,9 +25,12 @@ const Index = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isManageSheetOpen, setIsManageSheetOpen] = useState(false);
   const [elementToEdit, setElementToEdit] = useState<UIElement | null>(null);
+  const [isManageCategoriesSheetOpen, setIsManageCategoriesSheetOpen] = useState(false);
+  const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
 
   const { elements, loading, addElement, updateElement, deleteElement } = useElements();
-  const { categories: categoriesData, addCategory } = useCategories();
+  const { categories: categoriesData, addCategory, updateCategory, deleteCategory } = useCategories();
 
   // Map categories to string array with "Todos" as first item
   const categoryNames = useMemo(() => {
@@ -107,12 +112,28 @@ const Index = () => {
     setElementToEdit(null);
   };
 
+  const handleEditCategory = (category: Category) => {
+    setCategoryToEdit(category);
+    setIsEditCategoryModalOpen(true);
+  };
+
+  const handleSaveCategoryEdit = async (id: string, name: string, description?: string) => {
+    await updateCategory(id, name, description);
+    setIsEditCategoryModalOpen(false);
+    setCategoryToEdit(null);
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    await deleteCategory(id);
+  };
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         {/* Sidebar */}
         <AppSidebar 
           onAddCategory={() => setIsAddCategoryModalOpen(true)} 
+          onManageCategories={() => setIsManageCategoriesSheetOpen(true)}
           onManageElements={() => setIsManageSheetOpen(true)}
         />
 
@@ -239,6 +260,22 @@ const Index = () => {
           elements={elements}
           onEditElement={handleEditElement}
           onDeleteElement={handleDeleteElement}
+        />
+        <ManageCategoriesSheet
+          isOpen={isManageCategoriesSheetOpen}
+          onClose={() => setIsManageCategoriesSheetOpen(false)}
+          categories={categoriesData}
+          onEditCategory={handleEditCategory}
+          onDeleteCategory={handleDeleteCategory}
+        />
+        <EditCategoryModal
+          isOpen={isEditCategoryModalOpen}
+          onClose={() => {
+            setIsEditCategoryModalOpen(false);
+            setCategoryToEdit(null);
+          }}
+          onSave={handleSaveCategoryEdit}
+          category={categoryToEdit}
         />
       </div>
     </SidebarProvider>

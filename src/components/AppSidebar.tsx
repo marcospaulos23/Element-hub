@@ -1,4 +1,4 @@
-import { Home, BookOpen, Settings, HelpCircle, PanelLeft, Sparkles, FolderPlus, LayoutGrid } from "lucide-react";
+import { Home, BookOpen, Settings, HelpCircle, PanelLeft, Sparkles, FolderPlus, LayoutGrid, FolderEdit } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -17,10 +17,11 @@ import {
 
 interface AppSidebarProps {
   onAddCategory: () => void;
+  onManageCategories: () => void;
   onManageElements: () => void;
 }
 
-const AppSidebar = ({ onAddCategory, onManageElements }: AppSidebarProps) => {
+const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements }: AppSidebarProps) => {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
 
@@ -66,6 +67,16 @@ const AppSidebar = ({ onAddCategory, onManageElements }: AppSidebarProps) => {
                 >
                   <FolderPlus className="h-4 w-4" />
                   {!isCollapsed && <span>Adicionar Categoria</span>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={onManageCategories}
+                  tooltip="Editar Categorias"
+                  className="bg-secondary hover:bg-secondary/80 text-foreground border border-border"
+                >
+                  <FolderEdit className="h-4 w-4" />
+                  {!isCollapsed && <span>Editar Categorias</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
