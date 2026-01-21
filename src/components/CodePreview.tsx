@@ -126,16 +126,15 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const viewH = window.innerHeight;
               const padding = 30;
               
-              // Calcular escala
+              // Calcular escala - agora também aumenta elementos pequenos
               const availableW = viewW - padding;
               const availableH = viewH - padding;
               
-              currentScale = 1;
-              if (totalW > availableW || totalH > availableH) {
-                const scaleX = availableW / totalW;
-                const scaleY = availableH / totalH;
-                currentScale = Math.min(scaleX, scaleY);
-              }
+              // Calcular escala para caber e preencher melhor o espaço
+              const scaleX = availableW / totalW;
+              const scaleY = availableH / totalH;
+              // Usar a menor escala para manter proporção, mas limitar entre 0.5 e 2.5
+              currentScale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.5), 2.5);
               
               scaler.style.transform = 'scale(' + currentScale + ')';
               
