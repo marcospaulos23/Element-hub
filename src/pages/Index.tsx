@@ -32,7 +32,7 @@ const Index = () => {
     return ["Todos", ...categoriesData.map(c => c.name)];
   }, [categoriesData]);
 
-  // Group elements by category
+  // Group elements by category, sorted by creation date (oldest first, newest last)
   const elementsByCategory = useMemo(() => {
     const grouped: Record<string, UIElement[]> = {};
     
@@ -41,8 +41,15 @@ const Index = () => {
       grouped[cat.name] = [];
     });
     
+    // Sort elements by created_at ascending (oldest first, newest last)
+    const sortedElements = [...elements].sort((a, b) => {
+      const dateA = new Date((a as any).created_at || 0).getTime();
+      const dateB = new Date((b as any).created_at || 0).getTime();
+      return dateA - dateB;
+    });
+    
     // Distribute elements into their categories
-    elements.forEach(el => {
+    sortedElements.forEach(el => {
       const cats = Array.isArray(el.category) ? el.category : [el.category];
       cats.forEach(catName => {
         if (grouped[catName]) {
