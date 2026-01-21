@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Pencil, Trash2, FolderOpen, ChevronUp, ChevronDown } from "lucide-react";
+import { Pencil, Trash2, FolderOpen, GripVertical } from "lucide-react";
 import { Category } from "@/hooks/useCategories";
 import {
   AlertDialog,
@@ -21,7 +21,7 @@ interface ManageCategoriesSheetProps {
   categories: Category[];
   onEditCategory: (category: Category) => void;
   onDeleteCategory: (id: string) => void;
-  onReorderCategory: (id: string, direction: 'up' | 'down') => void;
+  onReorderCategories: (fromIndex: number, toIndex: number) => void;
 }
 
 const ManageCategoriesSheet = ({
@@ -30,15 +30,64 @@ const ManageCategoriesSheet = ({
   categories,
   onEditCategory,
   onDeleteCategory,
-  onReorderCategory,
+  onReorderCategories,
 }: ManageCategoriesSheetProps) => {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const dragNodeRef = useRef<HTMLDivElement | null>(null);
 
   const handleDelete = () => {
     if (categoryToDelete) {
       onDeleteCategory(categoryToDelete.id);
       setCategoryToDelete(null);
     }
+  };
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    setDraggedIndex(index);
+    dragNodeRef.current = e.currentTarget;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+    
+    // Add a slight delay to apply dragging styles
+    setTimeout(() => {
+      if (dragNodeRef.current) {
+        dragNodeRef.current.style.opacity = '0.5';
+      }
+    }, 0);
+  };
+
+  const handleDragEnd = () => {
+    if (dragNodeRef.current) {
+      dragNodeRef.current.style.opacity = '1';
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    dragNodeRef.current = null;
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    if (draggedIndex !== null && draggedIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, toIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex !== null && draggedIndex !== toIndex) {
+      onReorderCategories(draggedIndex, toIndex);
+    }
+    
+    handleDragEnd();
   };
 
   return (
@@ -51,7 +100,7 @@ const ManageCategoriesSheet = ({
               Gerenciar Categorias
             </SheetTitle>
             <SheetDescription className="text-muted-foreground">
-              Edite ou exclua suas categorias
+              Arraste para reordenar, edite ou exclua suas categorias
             </SheetDescription>
           </SheetHeader>
 
@@ -62,32 +111,28 @@ const ManageCategoriesSheet = ({
                 <p className="text-muted-foreground">Nenhuma categoria encontrada</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {categories.map((category, index) => (
                   <div
                     key={category.id}
-                    className="flex items-start justify-between p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/80 transition-colors"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, index)}
+                    className={`flex items-center p-4 rounded-lg bg-secondary/50 border transition-all cursor-move
+                      ${dragOverIndex === index && draggedIndex !== null && draggedIndex < index 
+                        ? 'border-primary border-b-2 mb-1' 
+                        : dragOverIndex === index && draggedIndex !== null && draggedIndex > index
+                        ? 'border-primary border-t-2 mt-1'
+                        : 'border-border hover:bg-secondary/80'}
+                      ${draggedIndex === index ? 'opacity-50' : 'opacity-100'}
+                    `}
                   >
-                    {/* Reorder Buttons */}
-                    <div className="flex flex-col gap-1 mr-3">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onReorderCategory(category.id, 'up')}
-                        disabled={index === 0}
-                        className="h-6 w-6 text-muted-foreground hover:text-primary disabled:opacity-30"
-                      >
-                        <ChevronUp className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onReorderCategory(category.id, 'down')}
-                        disabled={index === categories.length - 1}
-                        className="h-6 w-6 text-muted-foreground hover:text-primary disabled:opacity-30"
-                      >
-                        <ChevronDown className="w-4 h-4" />
-                      </Button>
+                    {/* Drag Handle */}
+                    <div className="flex items-center justify-center mr-3 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground">
+                      <GripVertical className="w-5 h-5" />
                     </div>
 
                     <div className="flex-1 min-w-0 mr-3">
@@ -104,7 +149,10 @@ const ManageCategoriesSheet = ({
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => onEditCategory(category)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditCategory(category);
+                        }}
                         className="h-8 w-8 text-muted-foreground hover:text-primary"
                       >
                         <Pencil className="w-4 h-4" />
@@ -112,7 +160,10 @@ const ManageCategoriesSheet = ({
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCategoryToDelete(category)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCategoryToDelete(category);
+                        }}
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
                       >
                         <Trash2 className="w-4 h-4" />
