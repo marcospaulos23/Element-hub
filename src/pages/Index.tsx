@@ -30,7 +30,7 @@ const Index = () => {
   const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
 
   const { elements, loading, addElement, updateElement, deleteElement } = useElements();
-  const { categories: categoriesData, addCategory, updateCategory, deleteCategory, reorderCategory } = useCategories();
+  const { categories: categoriesData, addCategory, updateCategory, deleteCategory, reorderCategories } = useCategories();
 
   // Map categories to string array with "Todos" as first item
   const categoryNames = useMemo(() => {
@@ -127,8 +127,8 @@ const Index = () => {
     await deleteCategory(id);
   };
 
-  const handleReorderCategory = async (id: string, direction: 'up' | 'down') => {
-    await reorderCategory(id, direction);
+  const handleReorderCategories = async (fromIndex: number, toIndex: number) => {
+    await reorderCategories(fromIndex, toIndex);
   };
 
   return (
@@ -271,7 +271,7 @@ const Index = () => {
           categories={categoriesData}
           onEditCategory={handleEditCategory}
           onDeleteCategory={handleDeleteCategory}
-          onReorderCategory={handleReorderCategory}
+          onReorderCategories={handleReorderCategories}
         />
         <EditCategoryModal
           isOpen={isEditCategoryModalOpen}

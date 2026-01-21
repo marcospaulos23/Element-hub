@@ -111,39 +111,48 @@ export const useCategories = () => {
     fetchCategories();
   }, []);
 
-  const reorderCategory = async (id: string, direction: 'up' | 'down') => {
-    const currentIndex = categories.findIndex(c => c.id === id);
-    if (currentIndex === -1) return;
+  const reorderCategories = async (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    if (fromIndex < 0 || fromIndex >= categories.length) return;
+    if (toIndex < 0 || toIndex >= categories.length) return;
     
-    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    if (newIndex < 0 || newIndex >= categories.length) return;
+    // Create new array with reordered items
+    const newCategories = [...categories];
+    const [movedItem] = newCategories.splice(fromIndex, 1);
+    newCategories.splice(toIndex, 0, movedItem);
     
-    const currentCategory = categories[currentIndex];
-    const swapCategory = categories[newIndex];
+    // Assign new display_order values based on position
+    const updates = newCategories.map((cat, index) => ({
+      id: cat.id,
+      display_order: index + 1
+    }));
+    
+    // Optimistically update UI
+    setCategories(newCategories.map((cat, index) => ({
+      ...cat,
+      display_order: index + 1
+    })));
     
     try {
-      // Swap display_order values
-      const [res1, res2] = await Promise.all([
+      // Update all display_order values in database
+      const updatePromises = updates.map(({ id, display_order }) =>
         supabase
           .from('categories')
-          .update({ display_order: swapCategory.display_order })
-          .eq('id', currentCategory.id),
-        supabase
-          .from('categories')
-          .update({ display_order: currentCategory.display_order })
-          .eq('id', swapCategory.id)
-      ]);
+          .update({ display_order })
+          .eq('id', id)
+      );
       
-      if (res1.error || res2.error) throw res1.error || res2.error;
+      const results = await Promise.all(updatePromises);
+      const hasError = results.some(r => r.error);
       
-      // Update local state
-      const newCategories = [...categories];
-      newCategories[currentIndex] = { ...currentCategory, display_order: swapCategory.display_order };
-      newCategories[newIndex] = { ...swapCategory, display_order: currentCategory.display_order };
-      setCategories(newCategories.sort((a, b) => a.display_order - b.display_order));
+      if (hasError) {
+        throw new Error('Failed to update some categories');
+      }
     } catch (error) {
-      console.error('Error reordering category:', error);
-      toast.error('Erro ao reordenar categoria');
+      console.error('Error reordering categories:', error);
+      toast.error('Erro ao reordenar categorias');
+      // Revert on error
+      fetchCategories();
     }
   };
 
@@ -153,7 +162,7 @@ export const useCategories = () => {
     addCategory,
     updateCategory,
     deleteCategory,
-    reorderCategory,
+    reorderCategories,
     refetch: fetchCategories,
   };
 };
