@@ -12,14 +12,14 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
 
   const categories = Array.isArray(element.category) ? element.category : [element.category];
   
-  // Only show preview image for elements with "Animações" or "Carregamento" categories
-  const isAnimationOrLoading = categories.some(cat => 
-    cat.toLowerCase().includes("animaç") || 
+  // Only show preview image for "Carregamento/Loaders" categories
+  // "Animação" and "Botão" are excluded - they always show live preview
+  const isLoadingCategory = categories.some(cat => 
     cat.toLowerCase().includes("carregamento") ||
     cat.toLowerCase().includes("loaders") ||
     cat.toLowerCase().includes("loading")
   );
-  const hasPreviewImage = isAnimationOrLoading && element.preview_image && element.preview_image.trim() !== "";
+  const hasPreviewImage = isLoadingCategory && element.preview_image && element.preview_image.trim() !== "";
 
   return (
     <div
