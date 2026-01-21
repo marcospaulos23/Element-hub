@@ -88,8 +88,8 @@ const Index = () => {
     await addElement(newElement);
   };
 
-  const handleAddCategory = async (categoryName: string) => {
-    await addCategory(categoryName);
+  const handleAddCategory = async (categoryName: string, description?: string) => {
+    await addCategory(categoryName, description);
   };
 
   const handleDeleteElement = async (id: string) => {
@@ -159,10 +159,17 @@ const Index = () => {
                   <div className="space-y-16">
                     {categoriesToDisplay.map((category) => (
                       <div key={category.id}>
-                        {/* Category Title */}
-                        <h2 className="text-2xl font-semibold text-foreground mb-6 border-b border-border pb-3">
-                          {category.name}
-                        </h2>
+                        {/* Category Title and Description */}
+                        <div className="mb-6 border-b border-border pb-3">
+                          <h2 className="text-2xl font-semibold text-foreground">
+                            {category.name}
+                          </h2>
+                          {category.description && (
+                            <p className="text-muted-foreground text-sm mt-1">
+                              {category.description}
+                            </p>
+                          )}
+                        </div>
                         
                         {/* Elements Grid for this Category */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

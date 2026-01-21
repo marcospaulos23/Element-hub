@@ -5,6 +5,7 @@ import { toast } from "sonner";
 export interface Category {
   id: string;
   name: string;
+  description: string | null;
   created_at: string;
 }
 
@@ -29,11 +30,11 @@ export const useCategories = () => {
     }
   };
 
-  const addCategory = async (name: string) => {
+  const addCategory = async (name: string, description?: string) => {
     try {
       const { data, error } = await supabase
         .from('categories')
-        .insert([{ name }])
+        .insert([{ name, description: description || null }])
         .select()
         .single();
 

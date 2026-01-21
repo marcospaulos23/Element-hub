@@ -3,16 +3,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { FolderPlus } from "lucide-react";
 
 interface AddCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (category: string) => void;
+  onAdd: (category: string, description?: string) => void;
 }
 
 const AddCategoryModal = ({ isOpen, onClose, onAdd }: AddCategoryModalProps) => {
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,8 +23,9 @@ const AddCategoryModal = ({ isOpen, onClose, onAdd }: AddCategoryModalProps) => 
       return;
     }
 
-    onAdd(name.trim());
+    onAdd(name.trim(), description.trim() || undefined);
     setName("");
+    setDescription("");
     onClose();
   };
 
@@ -49,6 +52,20 @@ const AddCategoryModal = ({ isOpen, onClose, onAdd }: AddCategoryModalProps) => 
               placeholder="Ex: Animações, Modals, etc."
               className="bg-secondary border-border focus:border-primary"
               required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="categoryDescription" className="text-foreground">
+              Descrição <span className="text-muted-foreground text-sm">(opcional)</span>
+            </Label>
+            <Textarea
+              id="categoryDescription"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descreva para que serve essa categoria..."
+              className="bg-secondary border-border focus:border-primary resize-none"
+              rows={3}
             />
           </div>
 
