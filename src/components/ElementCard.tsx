@@ -12,9 +12,9 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
 
   const categories = Array.isArray(element.category) ? element.category : [element.category];
   
-  // Check if element has BOTH "Animação" and "Botão" categories - these don't show preview image in grid
-  const hasAnimacao = categories.some(cat => cat.toLowerCase().includes("animaç") || cat.toLowerCase().includes("animacao"));
-  const hasBotao = categories.some(cat => cat.toLowerCase().includes("botão") || cat.toLowerCase().includes("botao"));
+  // Check if element has BOTH "Animação/Animações" and "Botão/Botões" categories - these don't show preview image in grid
+  const hasAnimacao = categories.some(cat => cat.toLowerCase().includes("animaç") || cat.toLowerCase().includes("animac"));
+  const hasBotao = categories.some(cat => cat.toLowerCase().includes("botõ") || cat.toLowerCase().includes("botão") || cat.toLowerCase().includes("botao") || cat.toLowerCase().includes("boto"));
   const isAnimacaoAndBotao = hasAnimacao && hasBotao;
   
   // Show preview image for animation/loading categories, EXCEPT when both Animação and Botão are selected
