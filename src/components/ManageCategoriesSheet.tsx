@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Pencil, Trash2, FolderOpen } from "lucide-react";
+import { Pencil, Trash2, FolderOpen, ChevronUp, ChevronDown } from "lucide-react";
 import { Category } from "@/hooks/useCategories";
 import {
   AlertDialog,
@@ -21,6 +21,7 @@ interface ManageCategoriesSheetProps {
   categories: Category[];
   onEditCategory: (category: Category) => void;
   onDeleteCategory: (id: string) => void;
+  onReorderCategory: (id: string, direction: 'up' | 'down') => void;
 }
 
 const ManageCategoriesSheet = ({
@@ -29,6 +30,7 @@ const ManageCategoriesSheet = ({
   categories,
   onEditCategory,
   onDeleteCategory,
+  onReorderCategory,
 }: ManageCategoriesSheetProps) => {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
@@ -61,11 +63,33 @@ const ManageCategoriesSheet = ({
               </div>
             ) : (
               <div className="space-y-3">
-                {categories.map((category) => (
+                {categories.map((category, index) => (
                   <div
                     key={category.id}
                     className="flex items-start justify-between p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/80 transition-colors"
                   >
+                    {/* Reorder Buttons */}
+                    <div className="flex flex-col gap-1 mr-3">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onReorderCategory(category.id, 'up')}
+                        disabled={index === 0}
+                        className="h-6 w-6 text-muted-foreground hover:text-primary disabled:opacity-30"
+                      >
+                        <ChevronUp className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onReorderCategory(category.id, 'down')}
+                        disabled={index === categories.length - 1}
+                        className="h-6 w-6 text-muted-foreground hover:text-primary disabled:opacity-30"
+                      >
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </div>
+
                     <div className="flex-1 min-w-0 mr-3">
                       <h3 className="font-medium text-foreground truncate">
                         {category.name}

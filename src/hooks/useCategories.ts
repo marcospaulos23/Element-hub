@@ -6,6 +6,7 @@ export interface Category {
   id: string;
   name: string;
   description: string | null;
+  display_order: number;
   created_at: string;
 }
 
@@ -18,7 +19,7 @@ export const useCategories = () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('name', { ascending: true });
+        .order('display_order', { ascending: true });
 
       if (error) throw error;
       setCategories(data || []);
@@ -32,9 +33,14 @@ export const useCategories = () => {
 
   const addCategory = async (name: string, description?: string) => {
     try {
+      // Get max display_order
+      const maxOrder = categories.length > 0 
+        ? Math.max(...categories.map(c => c.display_order)) + 1 
+        : 1;
+      
       const { data, error } = await supabase
         .from('categories')
-        .insert([{ name, description: description || null }])
+        .insert([{ name, description: description || null, display_order: maxOrder }])
         .select()
         .single();
 
@@ -45,7 +51,7 @@ export const useCategories = () => {
         }
         throw error;
       }
-      setCategories((prev) => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
+      setCategories((prev) => [...prev, data].sort((a, b) => a.display_order - b.display_order));
       toast.success('Categoria adicionada com sucesso!');
       return data;
     } catch (error) {
@@ -72,7 +78,7 @@ export const useCategories = () => {
         throw error;
       }
       setCategories((prev) => 
-        prev.map((cat) => cat.id === id ? data : cat).sort((a, b) => a.name.localeCompare(b.name))
+        prev.map((cat) => cat.id === id ? data : cat).sort((a, b) => a.display_order - b.display_order)
       );
       toast.success('Categoria atualizada com sucesso!');
       return data;
@@ -105,12 +111,49 @@ export const useCategories = () => {
     fetchCategories();
   }, []);
 
+  const reorderCategory = async (id: string, direction: 'up' | 'down') => {
+    const currentIndex = categories.findIndex(c => c.id === id);
+    if (currentIndex === -1) return;
+    
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= categories.length) return;
+    
+    const currentCategory = categories[currentIndex];
+    const swapCategory = categories[newIndex];
+    
+    try {
+      // Swap display_order values
+      const [res1, res2] = await Promise.all([
+        supabase
+          .from('categories')
+          .update({ display_order: swapCategory.display_order })
+          .eq('id', currentCategory.id),
+        supabase
+          .from('categories')
+          .update({ display_order: currentCategory.display_order })
+          .eq('id', swapCategory.id)
+      ]);
+      
+      if (res1.error || res2.error) throw res1.error || res2.error;
+      
+      // Update local state
+      const newCategories = [...categories];
+      newCategories[currentIndex] = { ...currentCategory, display_order: swapCategory.display_order };
+      newCategories[newIndex] = { ...swapCategory, display_order: currentCategory.display_order };
+      setCategories(newCategories.sort((a, b) => a.display_order - b.display_order));
+    } catch (error) {
+      console.error('Error reordering category:', error);
+      toast.error('Erro ao reordenar categoria');
+    }
+  };
+
   return {
     categories,
     loading: loading,
     addCategory,
     updateCategory,
     deleteCategory,
+    reorderCategory,
     refetch: fetchCategories,
   };
 };
