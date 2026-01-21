@@ -12,14 +12,19 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
 
   const categories = Array.isArray(element.category) ? element.category : [element.category];
   
-  // Only show preview image for "Carregamento/Loaders" categories
-  // "Animação" and "Botão" are excluded - they always show live preview
-  const isLoadingCategory = categories.some(cat => 
+  // Check if element has BOTH "Animação" and "Botão" categories - these don't show preview image in grid
+  const hasAnimacao = categories.some(cat => cat.toLowerCase().includes("animaç") || cat.toLowerCase().includes("animacao"));
+  const hasBotao = categories.some(cat => cat.toLowerCase().includes("botão") || cat.toLowerCase().includes("botao"));
+  const isAnimacaoAndBotao = hasAnimacao && hasBotao;
+  
+  // Show preview image for animation/loading categories, EXCEPT when both Animação and Botão are selected
+  const isAnimationOrLoading = categories.some(cat => 
+    cat.toLowerCase().includes("animaç") || 
     cat.toLowerCase().includes("carregamento") ||
     cat.toLowerCase().includes("loaders") ||
     cat.toLowerCase().includes("loading")
   );
-  const hasPreviewImage = isLoadingCategory && element.preview_image && element.preview_image.trim() !== "";
+  const hasPreviewImage = isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
 
   return (
     <div
