@@ -141,8 +141,11 @@ const ManageElementsSheet = ({
                   <div className="flex items-center gap-1 ml-3">
                     <button
                       onClick={() => {
-                        onEditElement(element);
                         onClose();
+                        // Small delay to let the sheet close before opening the edit modal
+                        setTimeout(() => {
+                          onEditElement(element);
+                        }, 150);
                       }}
                       className="p-2 hover:bg-primary/20 rounded-lg text-primary transition-colors"
                       title="Editar"
