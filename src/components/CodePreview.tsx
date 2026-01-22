@@ -216,8 +216,8 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
     return htmlContent;
   }, [code]);
 
-  // Handler para reiniciar animações quando o mouse entra
-  const handleMouseEnter = useCallback(() => {
+  // Handler para reiniciar animações quando o mouse sai
+  const handleMouseLeave = useCallback(() => {
     if (iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage('restartAnimations', '*');
     }
@@ -226,7 +226,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
   return (
     <div 
       className={`relative rounded-lg overflow-hidden border border-border bg-muted/30 ${className}`}
-      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <iframe
         ref={iframeRef}
