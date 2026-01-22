@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useCallback } from "react";
 
 interface CodePreviewProps {
   code: string;
@@ -6,6 +6,8 @@ interface CodePreviewProps {
 }
 
 const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
   const previewHtml = useMemo(() => {
     const htmlContent = `
       <!DOCTYPE html>
@@ -165,6 +167,41 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               requestAnimationFrame(keepCentered);
             }
 
+            // Função para reiniciar todas as animações
+            function restartAnimations() {
+              const content = document.getElementById('content');
+              if (!content) return;
+              
+              // Seleciona todos os elementos dentro do content
+              const allElements = content.querySelectorAll('*');
+              allElements.forEach(el => {
+                // Força o reinício das animações removendo e readicionando
+                const computedStyle = window.getComputedStyle(el);
+                const animationName = computedStyle.animationName;
+                
+                if (animationName && animationName !== 'none') {
+                  el.style.animation = 'none';
+                  el.offsetHeight; // Força reflow
+                  el.style.animation = '';
+                }
+              });
+              
+              // Também reinicia animações do próprio content
+              const contentStyle = window.getComputedStyle(content);
+              if (contentStyle.animationName && contentStyle.animationName !== 'none') {
+                content.style.animation = 'none';
+                content.offsetHeight;
+                content.style.animation = '';
+              }
+            }
+
+            // Escuta mensagens do parent para reiniciar animações
+            window.addEventListener('message', function(event) {
+              if (event.data === 'restartAnimations') {
+                restartAnimations();
+              }
+            });
+
             async function init() {
               await measureAndFit();
               keepCentered();
@@ -179,9 +216,20 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
     return htmlContent;
   }, [code]);
 
+  // Handler para reiniciar animações quando o mouse entra
+  const handleMouseEnter = useCallback(() => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage('restartAnimations', '*');
+    }
+  }, []);
+
   return (
-    <div className={`relative rounded-lg overflow-hidden border border-border bg-muted/30 ${className}`}>
+    <div 
+      className={`relative rounded-lg overflow-hidden border border-border bg-muted/30 ${className}`}
+      onMouseEnter={handleMouseEnter}
+    >
       <iframe
+        ref={iframeRef}
         srcDoc={previewHtml}
         className="absolute inset-0 w-full h-full"
         sandbox="allow-scripts"
