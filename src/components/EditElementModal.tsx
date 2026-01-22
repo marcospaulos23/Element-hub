@@ -115,7 +115,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
 
               {/* Categories - Multiple Selection */}
               <div className="space-y-3">
-                <Label className="text-foreground">Categorias</Label>
+                <Label className="text-foreground">Categorias / Tags</Label>
                 
                 {/* Selected Categories Tags */}
                 {selectedCategories.length > 0 && (
