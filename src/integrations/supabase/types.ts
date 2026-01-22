@@ -20,6 +20,7 @@ export type Database = {
           description: string | null
           display_order: number | null
           id: string
+          is_visible: boolean
           name: string
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           id?: string
+          is_visible?: boolean
           name: string
         }
         Update: {
@@ -34,6 +36,7 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           id?: string
+          is_visible?: boolean
           name?: string
         }
         Relationships: []

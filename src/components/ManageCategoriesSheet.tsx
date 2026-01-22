@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Pencil, Trash2, FolderOpen, GripVertical } from "lucide-react";
+import { Pencil, Trash2, FolderOpen, GripVertical, Eye, EyeOff } from "lucide-react";
 import { Category } from "@/hooks/useCategories";
 import {
   AlertDialog,
@@ -22,6 +22,7 @@ interface ManageCategoriesSheetProps {
   onEditCategory: (category: Category) => void;
   onDeleteCategory: (id: string) => void;
   onReorderCategories: (fromIndex: number, toIndex: number) => void;
+  onToggleVisibility: (id: string) => void;
 }
 
 const ManageCategoriesSheet = ({
@@ -31,6 +32,7 @@ const ManageCategoriesSheet = ({
   onEditCategory,
   onDeleteCategory,
   onReorderCategories,
+  onToggleVisibility,
 }: ManageCategoriesSheetProps) => {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -146,6 +148,18 @@ const ManageCategoriesSheet = ({
                       )}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleVisibility(category.id);
+                        }}
+                        className={`h-8 w-8 ${category.is_visible ? 'text-primary hover:text-primary/80' : 'text-muted-foreground hover:text-foreground'}`}
+                        title={category.is_visible ? 'Visível no repositório' : 'Oculto no repositório'}
+                      >
+                        {category.is_visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
