@@ -32,9 +32,14 @@ const Index = () => {
   const { elements, loading, addElement, updateElement, deleteElement } = useElements();
   const { categories: categoriesData, addCategory, updateCategory, deleteCategory, reorderCategories, toggleCategoryVisibility } = useCategories();
 
-  // Map visible categories to string array with "Todos" as first item
+  // Map visible categories to string array with "Todos" as first item (for filter bar)
   const categoryNames = useMemo(() => {
     return ["Todos", ...categoriesData.filter(c => c.is_visible).map(c => c.name)];
+  }, [categoriesData]);
+
+  // All categories for element modals (including hidden ones like "Animação")
+  const allCategoryNames = useMemo(() => {
+    return categoriesData.map(c => c.name);
   }, [categoriesData]);
 
   // Group elements by category, sorted by creation date (oldest first, newest last)
@@ -241,7 +246,7 @@ const Index = () => {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onAdd={handleAddElement}
-          categories={categoryNames.filter(c => c !== "Todos")}
+          categories={allCategoryNames}
         />
         <AddCategoryModal
           isOpen={isAddCategoryModalOpen}
@@ -256,7 +261,7 @@ const Index = () => {
           }}
           onSave={handleSaveEdit}
           element={elementToEdit}
-          categories={categoryNames.filter(c => c !== "Todos")}
+          categories={allCategoryNames}
         />
         <ManageElementsSheet
           isOpen={isManageSheetOpen}
