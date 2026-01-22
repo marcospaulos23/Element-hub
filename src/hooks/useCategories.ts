@@ -7,6 +7,7 @@ export interface Category {
   name: string;
   description: string | null;
   display_order: number;
+  is_visible: boolean;
   created_at: string;
 }
 
@@ -156,6 +157,36 @@ export const useCategories = () => {
     }
   };
 
+  const toggleCategoryVisibility = async (id: string) => {
+    const category = categories.find(c => c.id === id);
+    if (!category) return null;
+    
+    const newVisibility = !category.is_visible;
+    
+    // Optimistic update
+    setCategories(prev => 
+      prev.map(cat => cat.id === id ? { ...cat, is_visible: newVisibility } : cat)
+    );
+    
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .update({ is_visible: newVisibility })
+        .eq('id', id);
+
+      if (error) throw error;
+      return newVisibility;
+    } catch (error) {
+      console.error('Error toggling category visibility:', error);
+      toast.error('Erro ao alterar visibilidade');
+      // Revert on error
+      setCategories(prev => 
+        prev.map(cat => cat.id === id ? { ...cat, is_visible: !newVisibility } : cat)
+      );
+      return null;
+    }
+  };
+
   return {
     categories,
     loading: loading,
@@ -163,6 +194,7 @@ export const useCategories = () => {
     updateCategory,
     deleteCategory,
     reorderCategories,
+    toggleCategoryVisibility,
     refetch: fetchCategories,
   };
 };

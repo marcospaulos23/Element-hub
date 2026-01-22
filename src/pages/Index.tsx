@@ -30,11 +30,11 @@ const Index = () => {
   const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
 
   const { elements, loading, addElement, updateElement, deleteElement } = useElements();
-  const { categories: categoriesData, addCategory, updateCategory, deleteCategory, reorderCategories } = useCategories();
+  const { categories: categoriesData, addCategory, updateCategory, deleteCategory, reorderCategories, toggleCategoryVisibility } = useCategories();
 
-  // Map categories to string array with "Todos" as first item
+  // Map visible categories to string array with "Todos" as first item
   const categoryNames = useMemo(() => {
-    return ["Todos", ...categoriesData.map(c => c.name)];
+    return ["Todos", ...categoriesData.filter(c => c.is_visible).map(c => c.name)];
   }, [categoriesData]);
 
   // Group elements by category, sorted by creation date (oldest first, newest last)
@@ -69,14 +69,14 @@ const Index = () => {
     return grouped;
   }, [elements, categoriesData]);
 
-  // Filter categories to display based on active filter
+  // Filter categories to display based on active filter (only visible categories)
   const categoriesToDisplay = useMemo(() => {
     if (activeCategory === "Todos") {
-      // Show all categories that have elements
-      return categoriesData.filter(cat => elementsByCategory[cat.name]?.length > 0);
+      // Show all visible categories that have elements
+      return categoriesData.filter(cat => cat.is_visible && elementsByCategory[cat.name]?.length > 0);
     }
-    // Show only the selected category
-    return categoriesData.filter(cat => cat.name === activeCategory && elementsByCategory[cat.name]?.length > 0);
+    // Show only the selected category if visible
+    return categoriesData.filter(cat => cat.is_visible && cat.name === activeCategory && elementsByCategory[cat.name]?.length > 0);
   }, [activeCategory, categoriesData, elementsByCategory]);
 
   const handleElementClick = (element: UIElement) => {
@@ -272,6 +272,7 @@ const Index = () => {
           onEditCategory={handleEditCategory}
           onDeleteCategory={handleDeleteCategory}
           onReorderCategories={handleReorderCategories}
+          onToggleVisibility={toggleCategoryVisibility}
         />
         <EditCategoryModal
           isOpen={isEditCategoryModalOpen}
