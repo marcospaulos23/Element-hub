@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UIElement } from "@/hooks/useElements";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, X } from "lucide-react";
 import CodePreview from "./CodePreview";
 
 interface CodeModalProps {
@@ -36,6 +36,13 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
               </DialogTitle>
               <p className="text-muted-foreground mt-1">{element.description}</p>
             </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              title="Fechar"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
         </DialogHeader>
 
