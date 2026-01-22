@@ -36,13 +36,6 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
               </DialogTitle>
               <p className="text-muted-foreground mt-1">{element.description}</p>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-              title="Fechar"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
         </DialogHeader>
 
@@ -51,23 +44,32 @@ const CodeModal = ({ element, isOpen, onClose }: CodeModalProps) => {
           {/* Code Section */}
           <div className="flex flex-col">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-muted-foreground">Código do componente</span>
-              <button
-                onClick={handleCopy}
-                className="btn-copy flex items-center gap-2 text-sm"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    Copiado!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    Copiar código
-                  </>
-                )}
-              </button>
+              <span className="text-lg font-semibold text-foreground">Código do componente</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                  title="Fechar"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleCopy}
+                  className="btn-copy flex items-center gap-2 text-sm"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Copiar código
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             
             <div className="relative rounded-lg bg-code-bg border border-border overflow-hidden h-[280px]">
