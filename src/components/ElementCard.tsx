@@ -1,6 +1,7 @@
 import { useState, memo } from "react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
+import { Sparkles } from "lucide-react";
 
 interface ElementCardProps {
   element: UIElement;
@@ -10,15 +11,26 @@ interface ElementCardProps {
 const ElementCard = ({ element, onClick }: ElementCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const categories = Array.isArray(element.category) ? element.category : [element.category];
+  const allCategories = Array.isArray(element.category) ? element.category : [element.category];
+  
+  // Check if element has animation category (to show as characteristic badge)
+  const isAnimated = allCategories.some(cat => 
+    cat.toLowerCase().includes("animaç") || 
+    cat.toLowerCase().includes("animac")
+  );
+  
+  // Filter out animation categories from display - they'll show as a badge instead
+  const categories = allCategories.filter(cat => 
+    !cat.toLowerCase().includes("animaç") && 
+    !cat.toLowerCase().includes("animac")
+  );
   
   // Check if element has BOTH "Animação/Animações" and "Botão/Botões" categories - these don't show preview image in grid
-  const hasAnimacao = categories.some(cat => cat.toLowerCase().includes("animaç") || cat.toLowerCase().includes("animac"));
-  const hasBotao = categories.some(cat => cat.toLowerCase().includes("botõ") || cat.toLowerCase().includes("botão") || cat.toLowerCase().includes("botao") || cat.toLowerCase().includes("boto"));
-  const isAnimacaoAndBotao = hasAnimacao && hasBotao;
+  const hasBotao = allCategories.some(cat => cat.toLowerCase().includes("botõ") || cat.toLowerCase().includes("botão") || cat.toLowerCase().includes("botao") || cat.toLowerCase().includes("boto"));
+  const isAnimacaoAndBotao = isAnimated && hasBotao;
   
   // Show preview image for animation/loading categories, EXCEPT when both Animação and Botão are selected
-  const isAnimationOrLoading = categories.some(cat => 
+  const isAnimationOrLoading = allCategories.some(cat => 
     cat.toLowerCase().includes("animaç") || 
     cat.toLowerCase().includes("carregamento") ||
     cat.toLowerCase().includes("loaders") ||
@@ -56,6 +68,16 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
+        
+        {/* Animated badge indicator */}
+        {isAnimated && (
+          <div className="absolute top-2 right-2 z-20">
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-medium backdrop-blur-sm">
+              <Sparkles className="w-3 h-3" />
+              Animado
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Info */}
