@@ -23,15 +23,22 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               height: 100%;
               background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
               overflow: hidden;
+              display: flex;
+              justify-content: center;
+              align-items: center;
             }
             #container {
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
+              display: flex;
+              justify-content: center;
+              align-items: center;
             }
             #scaler {
               transform-origin: center center;
+            }
+            #content {
+              display: flex;
+              justify-content: center;
+              align-items: center;
             }
 
             @keyframes spin { to { transform: rotate(360deg); } }
@@ -62,112 +69,41 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
           </div>
 
           <script>
-            function getAllBounds(el) {
-              let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
-              
-              function measure(node) {
-                const r = node.getBoundingClientRect();
-                if (r.width > 0 || r.height > 0) {
-                  left = Math.min(left, r.left);
-                  top = Math.min(top, r.top);
-                  right = Math.max(right, r.right);
-                  bottom = Math.max(bottom, r.bottom);
-                }
-              }
-              
-              measure(el);
-              el.querySelectorAll('*').forEach(measure);
-              
-              if (!isFinite(left)) return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0, cx: 0, cy: 0 };
-              
-              return {
-                left,
-                top,
-                right,
-                bottom,
-                width: right - left,
-                height: bottom - top,
-                cx: (left + right) / 2,
-                cy: (top + bottom) / 2
-              };
-            }
-
-            let currentScale = 1;
-            let offsetX = 0;
-            let offsetY = 0;
-
             async function measureAndFit() {
-              const container = document.getElementById('container');
               const scaler = document.getElementById('scaler');
               const content = document.getElementById('content');
-              if (!container || !scaler || !content) return;
+              if (!scaler || !content) return;
 
-              // Reset
-              container.style.transform = 'translate(-50%, -50%)';
+              // Reset scale
               scaler.style.transform = 'scale(1)';
               
               await new Promise(r => requestAnimationFrame(r));
 
               // Medir bounds máximos durante 1.5s de animação
-              let minL = Infinity, minT = Infinity, maxR = -Infinity, maxB = -Infinity;
+              let maxW = 0, maxH = 0;
               const start = performance.now();
               
               while (performance.now() - start < 1500) {
-                const b = getAllBounds(content);
-                minL = Math.min(minL, b.left);
-                minT = Math.min(minT, b.top);
-                maxR = Math.max(maxR, b.right);
-                maxB = Math.max(maxB, b.bottom);
+                const b = content.getBoundingClientRect();
+                maxW = Math.max(maxW, b.width);
+                maxH = Math.max(maxH, b.height);
                 await new Promise(r => requestAnimationFrame(r));
               }
 
-              const totalW = maxR - minL;
-              const totalH = maxB - minT;
-              const animCx = (minL + maxR) / 2;
-              const animCy = (minT + maxB) / 2;
-              
               // Tamanho do viewport
               const viewW = window.innerWidth;
               const viewH = window.innerHeight;
-              const padding = 30;
+              const padding = 40;
               
-              // Calcular escala - agora também aumenta elementos pequenos
+              // Calcular escala
               const availableW = viewW - padding;
               const availableH = viewH - padding;
               
-              // Calcular escala para caber e preencher melhor o espaço
-              const scaleX = availableW / totalW;
-              const scaleY = availableH / totalH;
-              // Usar a menor escala para manter proporção, mas limitar entre 0.5 e 2.5
-              currentScale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.5), 2.5);
+              const scaleX = availableW / maxW;
+              const scaleY = availableH / maxH;
+              const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.5), 2.5);
               
-              scaler.style.transform = 'scale(' + currentScale + ')';
-              
-              // Centro da tela
-              const screenCx = viewW / 2;
-              const screenCy = viewH / 2;
-              
-              // Calcular offset para centralizar o centro da animação no centro da tela
-              offsetX = screenCx - animCx;
-              offsetY = screenCy - animCy;
-            }
-
-            function keepCentered() {
-              const container = document.getElementById('container');
-              const content = document.getElementById('content');
-              if (!container || !content) return;
-              
-              const b = getAllBounds(content);
-              const viewW = window.innerWidth;
-              const viewH = window.innerHeight;
-              
-              // Ajustar posição continuamente para manter no centro
-              const dx = (viewW / 2) - b.cx;
-              const dy = (viewH / 2) - b.cy;
-              
-              container.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
-              
-              requestAnimationFrame(keepCentered);
+              scaler.style.transform = 'scale(' + scale + ')';
             }
 
             // Função para reiniciar todas as animações
@@ -207,7 +143,6 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
 
             async function init() {
               await measureAndFit();
-              keepCentered();
             }
 
             window.addEventListener('load', init);
