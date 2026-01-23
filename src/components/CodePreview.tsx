@@ -9,6 +9,58 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const previewHtml = useMemo(() => {
+    const isFullscreen = /lovable:fullscreen/i.test(code);
+
+    if (isFullscreen) {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+              * { box-sizing: border-box; }
+              html, body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                background: #000;
+                overflow: hidden;
+              }
+              /* Prevent button text from wrapping */
+              button { white-space: nowrap; }
+            </style>
+          </head>
+          <body>
+            ${code}
+
+            <script>
+              // Função para reiniciar animações CSS (quando existirem)
+              function restartAnimations() {
+                const allElements = document.querySelectorAll('*');
+                allElements.forEach(el => {
+                  const computedStyle = window.getComputedStyle(el);
+                  const animationName = computedStyle.animationName;
+                  if (animationName && animationName !== 'none') {
+                    el.style.animation = 'none';
+                    el.offsetHeight; // Força reflow
+                    el.style.animation = '';
+                  }
+                });
+              }
+
+              window.addEventListener('message', function(event) {
+                if (event.data === 'restartAnimations') {
+                  restartAnimations();
+                }
+              });
+            </script>
+          </body>
+        </html>
+      `;
+      return htmlContent;
+    }
+
     const htmlContent = `
       <!DOCTYPE html>
       <html>
