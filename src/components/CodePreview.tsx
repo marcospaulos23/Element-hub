@@ -9,26 +9,6 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const previewHtml = useMemo(() => {
-    const isFullscreen = /lovable:fullscreen/i.test(code);
-
-    // Modo fullscreen: renderiza o código diretamente sem containers ou escala
-    if (isFullscreen) {
-      // Remove o comentário do marcador para não aparecer no HTML
-      const cleanCode = code.replace(/<!--\s*lovable:fullscreen\s*-->/gi, '').trim();
-      
-      const htmlContent = `<!DOCTYPE html>
-<html style="margin:0;padding:0;width:100%;height:100%;">
-<head>
-<meta charset="UTF-8">
-<script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body style="margin:0;padding:0;width:100%;height:100%;overflow:hidden;">
-${cleanCode}
-</body>
-</html>`;
-      return htmlContent;
-    }
-
     const htmlContent = `
       <!DOCTYPE html>
       <html>
