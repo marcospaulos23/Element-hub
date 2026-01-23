@@ -93,7 +93,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               // Tamanho do viewport
               const viewW = window.innerWidth;
               const viewH = window.innerHeight;
-              const padding = 40;
+              const padding = 8;
               
               // Calcular escala
               const availableW = viewW - padding;
@@ -101,7 +101,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               
               const scaleX = availableW / maxW;
               const scaleY = availableH / maxH;
-              const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.6), 2.5);
+              const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.6), 3.0);
               
               scaler.style.transform = 'scale(' + scale + ')';
             }
