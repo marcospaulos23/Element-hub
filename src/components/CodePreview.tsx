@@ -92,6 +92,17 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
           </div>
 
           <script>
+             function getPreviewTarget() {
+               const root = document.getElementById('content');
+               if (!root) return null;
+               return (
+                 root.querySelector('button') ||
+                 root.querySelector('[role="button"]') ||
+                 root.querySelector('input[type="button"]') ||
+                 root.querySelector('input[type="submit"]')
+               );
+             }
+
             function getAllBounds(el) {
               let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
               
@@ -132,22 +143,34 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const content = document.getElementById('content');
               if (!container || !scaler || !content) return;
 
+               const targetEl = getPreviewTarget();
+
               // Reset
               container.style.transform = 'translate(-50%, -50%)';
               scaler.style.transform = 'scale(1)';
               
               await new Promise(r => requestAnimationFrame(r));
 
-              // Medir bounds máximos durante 1.5s de animação
+               // Medir bounds máximos durante 1.5s de animação
               let minL = Infinity, minT = Infinity, maxR = -Infinity, maxB = -Infinity;
               const start = performance.now();
               
               while (performance.now() - start < 1500) {
-                const b = getAllBounds(content);
-                minL = Math.min(minL, b.left);
-                minT = Math.min(minT, b.top);
-                maxR = Math.max(maxR, b.right);
-                maxB = Math.max(maxB, b.bottom);
+                 // Se for um botão, medir SOMENTE o próprio botão (ignora efeitos/overflows internos)
+                 // para padronizar o tamanho visual no preview.
+                 if (targetEl) {
+                   const r = targetEl.getBoundingClientRect();
+                   minL = Math.min(minL, r.left);
+                   minT = Math.min(minT, r.top);
+                   maxR = Math.max(maxR, r.right);
+                   maxB = Math.max(maxB, r.bottom);
+                 } else {
+                   const b = getAllBounds(content);
+                   minL = Math.min(minL, b.left);
+                   minT = Math.min(minT, b.top);
+                   maxR = Math.max(maxR, b.right);
+                   maxB = Math.max(maxB, b.bottom);
+                 }
                 await new Promise(r => requestAnimationFrame(r));
               }
 
@@ -164,20 +187,29 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               // Calcular escala - agora também aumenta elementos pequenos
               const availableW = viewW - padding;
               const availableH = viewH - padding;
-              
-              // Calcular escala para que o elemento ocupe 70% do viewport
-              // Usar o MAIOR lado do elemento como referência
-              const maxSide = Math.max(totalW, totalH);
-              const targetSize = Math.min(availableW, availableH) * 0.7;
-              const targetScale = targetSize / maxSide;
-              
-              // Também calcular escala para caber sem cortar
-              const scaleX = availableW / totalW;
-              const scaleY = availableH / totalH;
-              const fitScale = Math.min(scaleX, scaleY);
-              
-              // Usar a maior escala entre targetScale (70%) e fitScale, limitado a 8
-              currentScale = Math.min(Math.max(fitScale, targetScale), 8);
+
+               // Também calcular escala para caber sem cortar
+               const scaleX = availableW / totalW;
+               const scaleY = availableH / totalH;
+               const fitScale = Math.min(scaleX, scaleY);
+
+               if (targetEl) {
+                 // Para botões: padronizar pela LARGURA (70% do preview)
+                 const desiredW = availableW * 0.7;
+                 const desiredScale = desiredW / totalW;
+                 // Garante que nunca corte (<= fitScale)
+                 currentScale = Math.min(desiredScale, fitScale, 8);
+               } else {
+                 // Fallback genérico: ocupar 70% do menor lado do viewport
+                 const maxSide = Math.max(totalW, totalH);
+                 const targetSize = Math.min(availableW, availableH) * 0.7;
+                 const targetScale = targetSize / maxSide;
+                 // Evitar corte: respeitar fitScale
+                 currentScale = Math.min(targetScale, fitScale, 8);
+               }
+
+               // Evita escala muito pequena por qualquer motivo
+               currentScale = Math.max(currentScale, 0.05);
               
               scaler.style.transform = 'scale(' + currentScale + ')';
               
@@ -244,8 +276,20 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
             });
 
             async function init() {
+               // Esperar fontes/estilos assentarem antes de medir
+               try {
+                 if (document.fonts && document.fonts.ready) {
+                   await document.fonts.ready;
+                 }
+               } catch (e) {}
+
+               // Mais um frame para aplicar layout final
+               await new Promise(r => requestAnimationFrame(r));
               await measureAndFit();
               keepCentered();
+
+               // Re-medição tardia (Tailwind CDN / webfonts)
+               setTimeout(measureAndFit, 350);
             }
 
             window.addEventListener('load', init);
