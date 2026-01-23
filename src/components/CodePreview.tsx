@@ -194,8 +194,8 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
                const fitScale = Math.min(scaleX, scaleY);
 
                if (targetEl) {
-                 // Para botões: padronizar pela LARGURA (70% do preview)
-                 const desiredW = availableW * 0.7;
+                 // Para botões: padronizar pela LARGURA (85% do preview)
+                 const desiredW = availableW * 0.85;
                  const desiredScale = desiredW / totalW;
                  // Garante que nunca corte (<= fitScale)
                  currentScale = Math.min(desiredScale, fitScale, 8);
