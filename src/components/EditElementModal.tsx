@@ -163,7 +163,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
 
               {/* Code */}
               <div className="space-y-2">
-                <Label htmlFor="edit-code" className="text-foreground">Código HTML/CSS</Label>
+                <Label htmlFor="edit-code" className="text-foreground">HTML/CSS e JavaScript</Label>
                 <Textarea
                   id="edit-code"
                   value={code}

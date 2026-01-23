@@ -155,7 +155,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
 
               {/* Code */}
               <div className="space-y-2">
-                <Label htmlFor="code" className="text-foreground">Código HTML/CSS</Label>
+                <Label htmlFor="code" className="text-foreground">HTML/CSS e JavaScript</Label>
                 <Textarea
                   id="code"
                   value={code}
