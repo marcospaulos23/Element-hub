@@ -37,6 +37,9 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
     cat.toLowerCase().includes("loading")
   );
   const hasPreviewImage = isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
+  
+  // Check if this is the special Kamui element that needs full container scaling
+  const isKamuiElement = element.name.toLowerCase().includes("kamui");
 
   return (
     <div
@@ -58,7 +61,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       <div className="relative aspect-[16/10] overflow-hidden bg-muted/30">
         {/* Always render CodePreview but hide it when showing preview image */}
         <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
-          <CodePreview code={element.code} className="w-full h-full" />
+          <CodePreview code={element.code} className="w-full h-full" fillContainer={isKamuiElement} />
         </div>
         {hasPreviewImage && (
           <img

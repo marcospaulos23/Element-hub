@@ -3,9 +3,10 @@ import { useMemo, useRef, useCallback } from "react";
 interface CodePreviewProps {
   code: string;
   className?: string;
+  fillContainer?: boolean;
 }
 
-const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
+const CodePreview = ({ code, className = "", fillContainer = false }: CodePreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const previewHtml = useMemo(() => {
@@ -93,7 +94,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               // Tamanho do viewport
               const viewW = window.innerWidth;
               const viewH = window.innerHeight;
-              const padding = 8;
+              const padding = ${fillContainer ? 8 : 40};
               
               // Calcular escala
               const availableW = viewW - padding;
@@ -101,7 +102,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               
               const scaleX = availableW / maxW;
               const scaleY = availableH / maxH;
-              const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.6), 3.0);
+              const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.3), ${fillContainer ? 3.0 : 1.2});
               
               scaler.style.transform = 'scale(' + scale + ')';
             }
