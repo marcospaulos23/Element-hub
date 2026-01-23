@@ -194,11 +194,11 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
                const fitScale = Math.min(scaleX, scaleY);
 
                if (targetEl) {
-                 // Para botões: padronizar pela LARGURA (85% do preview)
-                 const desiredW = availableW * 0.85;
+                 // Para botões: ocupar praticamente toda a largura (95%)
+                 const desiredW = availableW * 0.95;
                  const desiredScale = desiredW / totalW;
-                 // Garante que nunca corte (<= fitScale)
-                 currentScale = Math.min(desiredScale, fitScale, 8);
+                 // Permite escala até 15x para botões pequenos
+                 currentScale = Math.min(desiredScale, fitScale, 15);
                } else {
                  // Fallback genérico: ocupar 70% do menor lado do viewport
                  const maxSide = Math.max(totalW, totalH);
