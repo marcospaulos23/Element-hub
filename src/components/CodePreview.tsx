@@ -135,19 +135,20 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               const availableW = viewW - padding;
               const availableH = viewH - padding;
               
-              // Calcular escala para caber e preencher melhor o espaço
+              // Calcular escala para caber no espaço
               const scaleX = availableW / totalW;
               const scaleY = availableH / totalH;
-              
-              // Para elementos pequenos (como botões), garantir que ocupem pelo menos 50% do espaço
-              const minTargetSize = Math.min(availableW, availableH) * 0.5;
-              const currentSize = Math.max(totalW, totalH);
-              const minScaleToFill = minTargetSize / currentSize;
-              
-              // Usar a menor escala para manter proporção, mas garantir tamanho mínimo
-              // Limitar entre minScaleToFill (para preencher bem) e 5 (máximo)
               const fitScale = Math.min(scaleX, scaleY);
-              currentScale = Math.min(Math.max(fitScale, minScaleToFill), 5);
+              
+              // Para elementos pequenos (como botões), garantir um tamanho mínimo fixo
+              // Usar o MENOR lado do elemento para calcular a escala mínima
+              // Alvo: o menor lado do elemento deve ter pelo menos 40% do menor lado do viewport
+              const minSide = Math.min(totalW, totalH);
+              const targetMinSize = Math.min(availableW, availableH) * 0.4;
+              const minScaleToFill = targetMinSize / minSide;
+              
+              // Usar a maior entre fitScale e minScaleToFill, limitado a 6
+              currentScale = Math.min(Math.max(fitScale, minScaleToFill), 6);
               
               scaler.style.transform = 'scale(' + currentScale + ')';
               
