@@ -8,7 +8,34 @@ interface CodePreviewProps {
 const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Extrair apenas o conteúdo relevante se for HTML completo
+  const extractContent = (htmlCode: string): { styles: string; content: string } => {
+    // Verificar se é um documento HTML completo
+    const isFullHtml = /<(!DOCTYPE|html|head|body)/i.test(htmlCode);
+    
+    if (!isFullHtml) {
+      return { styles: '', content: htmlCode };
+    }
+    
+    // Extrair estilos do <style>
+    const styleMatches = htmlCode.match(/<style[^>]*>([\s\S]*?)<\/style>/gi) || [];
+    const styles = styleMatches
+      .map(s => s.replace(/<\/?style[^>]*>/gi, ''))
+      .join('\n');
+    
+    // Extrair conteúdo do <body>
+    const bodyMatch = htmlCode.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    let content = bodyMatch ? bodyMatch[1] : htmlCode;
+    
+    // Remover scripts embutidos (serão recriados)
+    content = content.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+    
+    return { styles, content };
+  };
+
   const previewHtml = useMemo(() => {
+    const { styles: extractedStyles, content: extractedContent } = extractContent(code);
+    
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -50,13 +77,16 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
             
             /* Prevent button text from wrapping */
             button { white-space: nowrap; }
+            
+            /* Estilos extraídos do código original */
+            ${extractedStyles}
           </style>
         </head>
         <body>
           <div id="container">
             <div id="scaler">
               <div id="content">
-                ${code}
+                ${extractedContent}
               </div>
             </div>
           </div>
