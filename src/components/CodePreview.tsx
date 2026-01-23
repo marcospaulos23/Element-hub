@@ -101,7 +101,7 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               
               const scaleX = availableW / maxW;
               const scaleY = availableH / maxH;
-              const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.5), 2.0);
+              const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.6), 2.5);
               
               scaler.style.transform = 'scale(' + scale + ')';
             }
