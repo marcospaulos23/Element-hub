@@ -138,8 +138,9 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
               // Calcular escala para caber e preencher melhor o espaço
               const scaleX = availableW / totalW;
               const scaleY = availableH / totalH;
-              // Usar a menor escala para manter proporção, mas limitar entre 0.5 e 2.5
-              currentScale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.5), 2.5);
+              // Usar a menor escala para manter proporção, mas limitar entre 0.5 e 4
+              // Increased max to 4 for small buttons to appear larger
+              currentScale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.5), 4);
               
               scaler.style.transform = 'scale(' + currentScale + ')';
               
