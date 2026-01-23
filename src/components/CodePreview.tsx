@@ -47,6 +47,9 @@ const CodePreview = ({ code, className = "" }: CodePreviewProps) => {
             .animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
             .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
             .animate-bounce { animation: bounce 1s infinite; }
+            
+            /* Prevent button text from wrapping */
+            button { white-space: nowrap; }
           </style>
         </head>
         <body>
