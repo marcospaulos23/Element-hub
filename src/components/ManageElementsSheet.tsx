@@ -112,7 +112,7 @@ const ManageElementsSheet = ({
               filteredElements.map((element) => (
                 <div
                   key={element.id}
-                  className="flex items-center p-3 pr-6 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                  className="flex items-center p-3 pr-6 mr-2 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                 >
                   {/* Element Preview - Show image if available, otherwise code preview */}
                   <div className="w-12 h-10 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0 flex items-center justify-center mr-3">
