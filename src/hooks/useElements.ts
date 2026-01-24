@@ -9,6 +9,7 @@ export interface UIElement {
   category: string[];
   code: string;
   preview_image?: string | null;
+  light_background?: boolean;
 }
 
 export const useElements = () => {

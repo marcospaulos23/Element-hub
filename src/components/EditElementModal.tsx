@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pencil, Image, X } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Pencil, Image, X, Sun } from "lucide-react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 import ImageDropZone from "./ImageDropZone";
@@ -24,6 +25,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [code, setCode] = useState("");
   const [previewImage, setPreviewImage] = useState("");
+  const [lightBackground, setLightBackground] = useState(false);
 
   useEffect(() => {
     if (element) {
@@ -33,6 +35,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
       setSelectedCategories(cats);
       setCode(element.code);
       setPreviewImage(element.preview_image || "");
+      setLightBackground(element.light_background || false);
     }
   }, [element]);
 
@@ -49,6 +52,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
       category: selectedCategories,
       code,
       preview_image: previewImage || null,
+      light_background: lightBackground,
     });
 
     onClose();
@@ -178,11 +182,22 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
             {/* Right Column - Live Preview and Image Upload */}
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-foreground">Preview ao Vivo</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-foreground">Preview ao Vivo</Label>
+                  <div className="flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-muted-foreground" />
+                    <Switch
+                      checked={lightBackground}
+                      onCheckedChange={setLightBackground}
+                    />
+                    <span className="text-xs text-muted-foreground">Fundo claro</span>
+                  </div>
+                </div>
                 <div className="overflow-hidden rounded-lg border border-border">
                   <CodePreview 
                     code={code} 
                     className="aspect-video min-h-[200px] max-h-[220px]"
+                    lightBackground={lightBackground}
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
