@@ -103,7 +103,7 @@ const ManageElementsSheet = ({
         </div>
 
         <ScrollArea className="h-[calc(100vh-180px)] mt-4 pr-2">
-          <div className="space-y-2">
+          <div className="space-y-2 pr-6">
             {filteredElements.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
                 Nenhum elemento encontrado
