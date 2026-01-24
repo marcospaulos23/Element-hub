@@ -4,9 +4,10 @@ interface CodePreviewProps {
   code: string;
   className?: string;
   fillContainer?: boolean;
+  lightBackground?: boolean;
 }
 
-const CodePreview = ({ code, className = "", fillContainer = false }: CodePreviewProps) => {
+const CodePreview = ({ code, className = "", fillContainer = false, lightBackground = false }: CodePreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const previewHtml = useMemo(() => {
@@ -22,7 +23,7 @@ const CodePreview = ({ code, className = "", fillContainer = false }: CodePrevie
               padding: 0;
               width: 100%;
               height: 100%;
-              background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+              background: ${lightBackground ? '#ffffff' : 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)'};
               overflow: hidden;
               display: flex;
               justify-content: center;
@@ -153,7 +154,7 @@ const CodePreview = ({ code, className = "", fillContainer = false }: CodePrevie
       </html>
     `;
     return htmlContent;
-  }, [code]);
+  }, [code, lightBackground]);
 
   // Handler para reiniciar animações quando o mouse sai
   const handleMouseLeave = useCallback(() => {
