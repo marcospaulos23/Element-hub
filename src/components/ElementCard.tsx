@@ -40,6 +40,9 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   
   // Check if this is the special Kamui element that needs full container scaling
   const isKamuiElement = element.name.toLowerCase().includes("kamui");
+  
+  // Check if this is the Pombo element that needs white background
+  const isPomboElement = element.name.toLowerCase().includes("pombo");
 
   return (
     <div
@@ -61,7 +64,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       <div className="relative aspect-[16/10] overflow-hidden bg-muted/30">
         {/* Always render CodePreview but hide it when showing preview image */}
         <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
-          <CodePreview code={element.code} className="w-full h-full" fillContainer={isKamuiElement} />
+          <CodePreview code={element.code} className="w-full h-full" fillContainer={isKamuiElement} lightBackground={isPomboElement} />
         </div>
         {hasPreviewImage && (
           <img
