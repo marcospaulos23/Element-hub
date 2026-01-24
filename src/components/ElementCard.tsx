@@ -44,6 +44,8 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   // Check if this is the Pombo element that needs white background
   const isPomboElement = element.name.toLowerCase().includes("pombo");
 
+  const previewContainerBg = isPomboElement ? "bg-primary-foreground" : "bg-muted/30";
+
   return (
     <div
       onClick={onClick}
@@ -61,7 +63,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       />
 
       {/* Code Preview / Image */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-muted/30">
+      <div className={`relative aspect-[16/10] overflow-hidden ${previewContainerBg}`}>
         {/* Always render CodePreview but hide it when showing preview image */}
         <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
           <CodePreview code={element.code} className="w-full h-full" fillContainer={isKamuiElement} lightBackground={isPomboElement} />
@@ -73,7 +75,9 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? "opacity-0 pointer-events-none" : "opacity-100"}`}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
+        {!isPomboElement && (
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
+        )}
         
         {/* Animated badge indicator */}
         {isAnimated && (
