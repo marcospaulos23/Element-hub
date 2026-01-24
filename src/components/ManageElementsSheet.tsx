@@ -75,6 +75,13 @@ const ManageElementsSheet = ({
     return cats.join(", ");
   };
 
+  // Helper to truncate name to first 2 words
+  const truncateName = (name: string) => {
+    const words = name.split(" ");
+    if (words.length <= 2) return name;
+    return words.slice(0, 2).join(" ") + "...";
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-[420px] sm:w-[560px]">
@@ -129,16 +136,16 @@ const ManageElementsSheet = ({
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-foreground truncate">
-                      {element.name}
+                  <div className="flex-1 min-w-0 mr-2">
+                    <h4 className="font-medium text-foreground" title={element.name}>
+                      {truncateName(element.name)}
                     </h4>
                     <p className="text-sm text-muted-foreground truncate">
                       {displayCategories(element.category)}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1 ml-3 mr-2 flex-shrink-0">
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <button
                       onClick={() => {
                         onClose();
