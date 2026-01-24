@@ -102,7 +102,7 @@ const ManageElementsSheet = ({
           </Select>
         </div>
 
-        <ScrollArea className="h-[calc(100vh-180px)] mt-4 pr-10">
+        <ScrollArea className="h-[calc(100vh-180px)] mt-4 pr-2">
           <div className="space-y-2">
             {filteredElements.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
@@ -112,7 +112,7 @@ const ManageElementsSheet = ({
               filteredElements.map((element) => (
                 <div
                   key={element.id}
-                  className="flex items-center p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                  className="flex items-center p-3 pr-6 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                 >
                   {/* Element Preview - Show image if available, otherwise code preview */}
                   <div className="w-12 h-10 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0 flex items-center justify-center mr-3">
@@ -138,7 +138,7 @@ const ManageElementsSheet = ({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1 ml-3 flex-shrink-0">
+                  <div className="flex items-center gap-1 ml-3 mr-2 flex-shrink-0">
                     <button
                       onClick={() => {
                         onClose();
