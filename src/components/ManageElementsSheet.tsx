@@ -77,7 +77,7 @@ const ManageElementsSheet = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="w-[420px] sm:w-[560px]">
         <SheetHeader>
           <SheetTitle>Gerenciar Elementos</SheetTitle>
           <SheetDescription>
@@ -102,7 +102,7 @@ const ManageElementsSheet = ({
           </Select>
         </div>
 
-        <ScrollArea className="h-[calc(100vh-180px)] mt-4 pr-8">
+        <ScrollArea className="h-[calc(100vh-180px)] mt-4 pr-10">
           <div className="space-y-2">
             {filteredElements.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
