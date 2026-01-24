@@ -48,6 +48,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          light_background: boolean
           name: string
           preview_image: string | null
           updated_at: string
@@ -58,6 +59,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          light_background?: boolean
           name: string
           preview_image?: string | null
           updated_at?: string
@@ -68,6 +70,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          light_background?: boolean
           name?: string
           preview_image?: string | null
           updated_at?: string
