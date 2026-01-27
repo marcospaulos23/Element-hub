@@ -41,8 +41,10 @@ const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements }: App
       <SidebarHeader className="p-3">
         {/* Collapse Button - Top */}
         <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <span className="font-semibold text-foreground text-lg">Element Hub</span>
+        {!isCollapsed && (
+            <span className="font-semibold text-foreground text-lg tracking-wider" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+              Element Hub
+            </span>
           )}
           <SidebarMenuButton
             onClick={toggleSidebar}
