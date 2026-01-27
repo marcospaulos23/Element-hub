@@ -29,10 +29,6 @@ const CodePreview = ({ code, className = "", fillContainer = false, lightBackgro
               justify-content: center;
               align-items: center;
             }
-            /* Prevent click interactions that change button states */
-            #content * {
-              pointer-events: none !important;
-            }
             #container {
               display: flex;
               justify-content: center;
