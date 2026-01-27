@@ -7,10 +7,46 @@ interface CodePreviewProps {
   lightBackground?: boolean;
 }
 
+// Helper function to extract styles and body content from full HTML documents
+const extractHtmlParts = (code: string): { styles: string; bodyContent: string; scripts: string } => {
+  // Check if the code is a full HTML document
+  const isFullHtml = code.trim().toLowerCase().includes('<!doctype html') || 
+                     code.trim().toLowerCase().startsWith('<html');
+  
+  if (!isFullHtml) {
+    return { styles: '', bodyContent: code, scripts: '' };
+  }
+
+  // Extract styles from <style> tags
+  const styleMatches = code.match(/<style[^>]*>([\s\S]*?)<\/style>/gi) || [];
+  const styles = styleMatches.map(match => {
+    const content = match.replace(/<\/?style[^>]*>/gi, '');
+    return content;
+  }).join('\n');
+
+  // Extract scripts from <script> tags (excluding external scripts)
+  const scriptMatches = code.match(/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/gi) || [];
+  const scripts = scriptMatches.map(match => {
+    const content = match.replace(/<\/?script[^>]*>/gi, '');
+    return content;
+  }).join('\n');
+
+  // Extract body content
+  const bodyMatch = code.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  let bodyContent = bodyMatch ? bodyMatch[1] : code;
+  
+  // Remove script tags from body content (we'll add them separately)
+  bodyContent = bodyContent.replace(/<script(?![^>]*src=)[^>]*>[\s\S]*?<\/script>/gi, '');
+  
+  return { styles, bodyContent, scripts };
+};
+
 const CodePreview = ({ code, className = "", fillContainer = false, lightBackground = false }: CodePreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const previewHtml = useMemo(() => {
+    const { styles: extractedStyles, bodyContent, scripts: extractedScripts } = extractHtmlParts(code);
+    
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -59,13 +95,16 @@ const CodePreview = ({ code, className = "", fillContainer = false, lightBackgro
             
             /* Prevent button text from wrapping */
             button { white-space: nowrap; }
+            
+            /* Extracted styles from element code */
+            ${extractedStyles}
           </style>
         </head>
         <body>
           <div id="container">
             <div id="scaler">
               <div id="content">
-                ${code}
+                ${bodyContent}
               </div>
             </div>
           </div>
@@ -149,12 +188,15 @@ const CodePreview = ({ code, className = "", fillContainer = false, lightBackgro
 
             window.addEventListener('load', init);
             setTimeout(init, 100);
+            
+            // Execute extracted scripts
+            ${extractedScripts}
           </script>
         </body>
       </html>
     `;
     return htmlContent;
-  }, [code, lightBackground]);
+  }, [code, fillContainer, lightBackground]);
 
   // Handler para reiniciar animações quando o mouse sai
   const handleMouseLeave = useCallback(() => {
