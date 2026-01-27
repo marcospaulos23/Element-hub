@@ -6,12 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Pencil, Image, X, Sun, Wand2 } from "lucide-react";
+import { Pencil, Image, X, Sun } from "lucide-react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 import ImageDropZone from "./ImageDropZone";
-import { convertJsxToHtml, looksLikeJsx } from "@/lib/jsxToHtml";
-import { toast } from "@/hooks/use-toast";
 
 interface EditElementModalProps {
   isOpen: boolean;
@@ -169,30 +167,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
 
               {/* Code */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="edit-code" className="text-foreground">Código HTML/CSS</Label>
-                  {looksLikeJsx(code) && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs gap-1 text-primary hover:text-primary"
-                      onClick={() => {
-                        const { html, wasConverted } = convertJsxToHtml(code);
-                        if (wasConverted) {
-                          setCode(html);
-                          toast({
-                            title: "Código convertido!",
-                            description: "JSX/React foi convertido para HTML puro.",
-                          });
-                        }
-                      }}
-                    >
-                      <Wand2 className="w-3 h-3" />
-                      Converter JSX → HTML
-                    </Button>
-                  )}
-                </div>
+                <Label htmlFor="edit-code" className="text-foreground">Código HTML/CSS</Label>
                 <Textarea
                   id="edit-code"
                   value={code}
@@ -201,11 +176,6 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
                   className="bg-secondary border-border focus:border-primary font-mono text-sm min-h-[140px]"
                   required
                 />
-                {looksLikeJsx(code) && (
-                  <p className="text-xs text-amber-500">
-                    ⚠️ Código parece ser JSX/React. Clique em "Converter" para transformar em HTML.
-                  </p>
-                )}
               </div>
             </div>
 
