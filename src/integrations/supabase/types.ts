@@ -52,6 +52,7 @@ export type Database = {
           name: string
           preview_image: string | null
           updated_at: string
+          use_preview_image: boolean
         }
         Insert: {
           category: string[]
@@ -63,6 +64,7 @@ export type Database = {
           name: string
           preview_image?: string | null
           updated_at?: string
+          use_preview_image?: boolean
         }
         Update: {
           category?: string[]
@@ -74,6 +76,7 @@ export type Database = {
           name?: string
           preview_image?: string | null
           updated_at?: string
+          use_preview_image?: boolean
         }
         Relationships: []
       }

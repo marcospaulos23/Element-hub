@@ -10,6 +10,7 @@ export interface UIElement {
   code: string;
   preview_image?: string | null;
   light_background?: boolean;
+  use_preview_image?: boolean;
 }
 
 export const useElements = () => {

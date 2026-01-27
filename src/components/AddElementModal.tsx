@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Image, X, Sun } from "lucide-react";
+import { Plus, Image, X, Sun, ImageOff } from "lucide-react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 import ImageDropZone from "./ImageDropZone";
@@ -25,6 +25,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
   const [code, setCode] = useState("");
   const [previewImage, setPreviewImage] = useState("");
   const [lightBackground, setLightBackground] = useState(false);
+  const [usePreviewImage, setUsePreviewImage] = useState(true);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +41,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
       code,
       preview_image: previewImage || null,
       light_background: lightBackground,
+      use_preview_image: usePreviewImage,
     });
 
     // Reset form
@@ -49,6 +51,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
     setCode("");
     setPreviewImage("");
     setLightBackground(false);
+    setUsePreviewImage(true);
     onClose();
   };
 
@@ -194,6 +197,18 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
                 <p className="text-xs text-muted-foreground">
                   A visualização será atualizada conforme você digita o código
                 </p>
+              </div>
+
+              {/* Use Preview Image Toggle */}
+              <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg border border-border">
+                <div className="flex items-center gap-2">
+                  <ImageOff className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">Usar imagem no preview</span>
+                </div>
+                <Switch
+                  checked={usePreviewImage}
+                  onCheckedChange={setUsePreviewImage}
+                />
               </div>
 
               {/* Image Upload Section */}
