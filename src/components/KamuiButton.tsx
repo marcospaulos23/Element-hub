@@ -1,13 +1,17 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
-const KamuiButton = () => {
+interface KamuiButtonProps {
+  children?: ReactNode;
+  onAnimationStart?: () => void;
+}
+
+const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const animationRef = useRef<number>();
   const [isHidden, setIsHidden] = useState(false);
-  
   const stateRef = useRef({
     particles: [] as any[],
     angle: 0,
@@ -107,6 +111,7 @@ const KamuiButton = () => {
     state.isActivated = true;
     state.isWaiting = false;
     setIsHidden(true);
+    onAnimationStart?.();
 
     const width = canvas.width;
     const height = canvas.height;
@@ -201,39 +206,42 @@ const KamuiButton = () => {
   }, [navigate]);
 
   return (
-    <div className="relative w-screen h-screen flex items-center justify-center" style={{ perspective: "1500px" }}>
+    <div className="relative w-full min-h-screen flex items-center" style={{ perspective: "1500px" }}>
       <canvas
         ref={canvasRef}
         className="absolute top-0 left-0 w-full h-full pointer-events-none transition-opacity duration-600"
       />
-      <button
-        ref={btnRef}
-        onClick={triggerKamui}
-        className={`
-          z-10 px-10 py-[18px] bg-foreground text-background border-none rounded-[14px]
-          font-extrabold text-base cursor-pointer flex items-center gap-3
-          uppercase tracking-wide transition-all duration-400
-          hover:-translate-y-1 hover:scale-[1.02]
-          active:-translate-y-[1px] active:scale-[0.98]
-          ${isHidden ? "hidden" : ""}
-        `}
-        style={{
-          boxShadow: "0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)",
-        }}
-      >
-        <span>Explorar Repositório</span>
-        <svg
-          className="w-[22px] h-[22px] stroke-[3] transition-transform duration-400 group-hover:translate-x-2"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      <div className="w-full px-6 md:px-12 lg:px-16 z-10">
+        {children}
+        <button
+          ref={btnRef}
+          onClick={triggerKamui}
+          className={`
+            px-10 py-[18px] bg-foreground text-background border-none rounded-[14px]
+            font-extrabold text-base cursor-pointer flex items-center gap-3
+            uppercase tracking-wide transition-all duration-400
+            hover:-translate-y-1 hover:scale-[1.02]
+            active:-translate-y-[1px] active:scale-[0.98]
+            ${isHidden ? "hidden" : ""}
+          `}
+          style={{
+            boxShadow: "0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)",
+          }}
         >
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
+          <span>Explorar Repositório</span>
+          <svg
+            className="w-[22px] h-[22px] stroke-[3] transition-transform duration-400 group-hover:translate-x-2"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };
