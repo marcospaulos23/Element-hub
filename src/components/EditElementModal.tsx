@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Pencil, Image, X, Sun } from "lucide-react";
+import { Pencil, Image, X, Sun, ImageOff } from "lucide-react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 import ImageDropZone from "./ImageDropZone";
@@ -26,6 +26,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
   const [code, setCode] = useState("");
   const [previewImage, setPreviewImage] = useState("");
   const [lightBackground, setLightBackground] = useState(false);
+  const [usePreviewImage, setUsePreviewImage] = useState(true);
 
   useEffect(() => {
     if (element) {
@@ -36,6 +37,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
       setCode(element.code);
       setPreviewImage(element.preview_image || "");
       setLightBackground(element.light_background || false);
+      setUsePreviewImage(element.use_preview_image !== false);
     }
   }, [element]);
 
@@ -53,6 +55,7 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
       code,
       preview_image: previewImage || null,
       light_background: lightBackground,
+      use_preview_image: usePreviewImage,
     });
 
     onClose();
@@ -203,6 +206,18 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
                 <p className="text-xs text-muted-foreground">
                   O preview será atualizado conforme você digita o código
                 </p>
+              </div>
+
+              {/* Use Preview Image Toggle */}
+              <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg border border-border">
+                <div className="flex items-center gap-2">
+                  <ImageOff className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">Usar imagem no preview</span>
+                </div>
+                <Switch
+                  checked={usePreviewImage}
+                  onCheckedChange={setUsePreviewImage}
+                />
               </div>
 
               {/* Image Upload Section */}
