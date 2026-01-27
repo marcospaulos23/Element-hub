@@ -29,14 +29,18 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   const hasBotao = allCategories.some(cat => cat.toLowerCase().includes("botõ") || cat.toLowerCase().includes("botão") || cat.toLowerCase().includes("botao") || cat.toLowerCase().includes("boto"));
   const isAnimacaoAndBotao = isAnimated && hasBotao;
   
+  // Check if use_preview_image is enabled (defaults to true if not set)
+  const usePreviewImageEnabled = element.use_preview_image !== false;
+  
   // Show preview image for animation/loading categories, EXCEPT when both Animação and Botão are selected
+  // AND only if use_preview_image is enabled
   const isAnimationOrLoading = allCategories.some(cat => 
     cat.toLowerCase().includes("animaç") || 
     cat.toLowerCase().includes("carregamento") ||
     cat.toLowerCase().includes("loaders") ||
     cat.toLowerCase().includes("loading")
   );
-  const hasPreviewImage = isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
+  const hasPreviewImage = usePreviewImageEnabled && isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
   
   // Check if this is the special Kamui element that needs full container scaling
   const isKamuiElement = element.name.toLowerCase().includes("kamui");
