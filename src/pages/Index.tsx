@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
 import Hero from "@/components/Hero";
@@ -13,10 +14,14 @@ import ManageElementsSheet from "@/components/ManageElementsSheet";
 import ManageCategoriesSheet from "@/components/ManageCategoriesSheet";
 import { useElements, UIElement } from "@/hooks/useElements";
 import { useCategories, Category } from "@/hooks/useCategories";
-import { Plus } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, profile, loading: authLoading } = useAuth();
+  
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [selectedElement, setSelectedElement] = useState<UIElement | null>(null);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
@@ -31,6 +36,17 @@ const Index = () => {
 
   const { elements, loading, addElement, updateElement, deleteElement } = useElements();
   const { categories: categoriesData, addCategory, updateCategory, deleteCategory, reorderCategories, toggleCategoryVisibility } = useCategories();
+
+  // Redirect if not authenticated or not approved
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        navigate("/auth", { state: { returnTo: "/repository" } });
+      } else if (profile && !profile.is_approved) {
+        navigate("/access-pending");
+      }
+    }
+  }, [user, profile, authLoading, navigate]);
 
   // Map visible categories to string array with "Todos" as first item (for filter bar)
   const categoryNames = useMemo(() => {
@@ -162,6 +178,15 @@ const Index = () => {
   const handleReorderCategories = async (fromIndex: number, toIndex: number) => {
     await reorderCategories(fromIndex, toIndex);
   };
+
+  // Show loading while checking auth
+  if (authLoading || (user && !profile)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider defaultOpen={true}>

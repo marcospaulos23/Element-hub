@@ -14,6 +14,7 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
   const animationRef = useRef<number>();
   const [isHidden, setIsHidden] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const stateRef = useRef({
     particles: [] as any[],
     angle: 0,
@@ -25,14 +26,32 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
     isWaiting: false,
   });
 
-  // Check authentication status on mount
+  // Check authentication and approval status on mount
   useEffect(() => {
+    const checkAuthAndApproval = async (userId: string) => {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_approved")
+        .eq("user_id", userId)
+        .maybeSingle();
+      
+      setIsApproved(profile?.is_approved ?? false);
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
+      if (session?.user) {
+        checkAuthAndApproval(session.user.id);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setIsAuthenticated(!!session);
+      if (session?.user) {
+        checkAuthAndApproval(session.user.id);
+      } else {
+        setIsApproved(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -122,6 +141,12 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
       return;
     }
 
+    // If authenticated but not approved, redirect to pending page
+    if (!isApproved) {
+      navigate("/access-pending");
+      return;
+    }
+
     const state = stateRef.current;
     const canvas = canvasRef.current;
     const btn = btnRef.current;
@@ -155,7 +180,7 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
     for (let i = 0; i < 550; i++) {
       state.particles.push(new Particle(0, 0, false, width, height));
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isApproved, navigate]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

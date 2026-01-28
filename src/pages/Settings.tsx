@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Camera, Loader2, LogOut, Save, User } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, LogOut, Save, User, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,7 @@ const Settings = () => {
   const [displayName, setDisplayName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -36,12 +38,28 @@ const Settings = () => {
     }
   }, [user, loading, navigate]);
 
-  // Load profile data
+  // Load profile data and check admin status
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || "");
     }
-  }, [profile]);
+    
+    const checkAdmin = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      
+      setIsAdmin(!!data);
+    };
+    
+    if (user) {
+      checkAdmin();
+    }
+  }, [profile, user]);
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
@@ -203,6 +221,29 @@ const Settings = () => {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Admin Card - Only show for admins */}
+        {isAdmin && (
+          <Card className="border-border mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Administração
+              </CardTitle>
+              <CardDescription>
+                Gerencie usuários e permissões
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild variant="outline">
+                <Link to="/admin/users">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Gerenciar Usuários
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Account Card */}
         <Card className="border-border border-destructive/30">
