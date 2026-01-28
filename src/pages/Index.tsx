@@ -42,6 +42,11 @@ const Index = () => {
     return categoriesData.map(c => c.name);
   }, [categoriesData]);
 
+  // Pinned elements per category (element name -> position in that category)
+  const pinnedElements: Record<string, string[]> = {
+    "Fundo de Página": ["Caminho Colorido", "Circulo colorido", "Super Herói"],
+  };
+
   // Group elements by category, sorted by creation date (oldest first, newest last)
   const elementsByCategory = useMemo(() => {
     const grouped: Record<string, UIElement[]> = {};
@@ -69,6 +74,28 @@ const Index = () => {
           }
         }
       });
+    });
+    
+    // Apply pinned elements ordering per category
+    Object.entries(pinnedElements).forEach(([categoryName, pinnedNames]) => {
+      if (grouped[categoryName]) {
+        const pinned: UIElement[] = [];
+        const rest: UIElement[] = [];
+        
+        grouped[categoryName].forEach(el => {
+          const pinnedIndex = pinnedNames.findIndex(name => 
+            el.name.toLowerCase().includes(name.toLowerCase())
+          );
+          if (pinnedIndex !== -1) {
+            pinned[pinnedIndex] = el;
+          } else {
+            rest.push(el);
+          }
+        });
+        
+        // Filter out undefined slots and combine with rest
+        grouped[categoryName] = [...pinned.filter(Boolean), ...rest];
+      }
     });
     
     return grouped;
