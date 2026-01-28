@@ -147,7 +147,17 @@ const CodePreview = ({ code, className = "", fillContainer = false, lightBackgro
               await measureAndFit();
             }
 
+            // Debounce resize to prevent constant recalculation
+            let resizeTimeout;
+            function handleResize() {
+              clearTimeout(resizeTimeout);
+              resizeTimeout = setTimeout(() => {
+                measureAndFit();
+              }, 150);
+            }
+
             window.addEventListener('load', init);
+            window.addEventListener('resize', handleResize);
             setTimeout(init, 100);
           </script>
         </body>
