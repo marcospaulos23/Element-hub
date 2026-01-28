@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,21 @@ const emailSchema = z.string().email("Email inválido").max(255, "Email muito lo
 const passwordSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres").max(72, "Senha muito longa");
 const displayNameSchema = z.string().max(100, "Nome muito longo").optional();
 
+interface LocationState {
+  returnTo?: string;
+}
+
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading, signIn, signUp } = useAuth();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Get return URL from state or default to repository
+  const returnTo = (location.state as LocationState)?.returnTo || "/repository";
 
   // Login form
   const [loginEmail, setLoginEmail] = useState("");
@@ -34,9 +42,9 @@ const Auth = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
-      navigate("/repository");
+      navigate(returnTo);
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, returnTo]);
 
   const validateLogin = () => {
     const newErrors: Record<string, string> = {};
@@ -103,7 +111,7 @@ const Auth = () => {
     setIsSubmitting(false);
     
     if (!error) {
-      navigate("/repository");
+      navigate(returnTo);
     }
   };
 
@@ -116,7 +124,7 @@ const Auth = () => {
     setIsSubmitting(false);
     
     if (!error) {
-      navigate("/repository");
+      navigate(returnTo);
     }
   };
 

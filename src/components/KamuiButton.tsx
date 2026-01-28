@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface KamuiButtonProps {
   children?: ReactNode;
@@ -12,6 +13,7 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const animationRef = useRef<number>();
   const [isHidden, setIsHidden] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const stateRef = useRef({
     particles: [] as any[],
     angle: 0,
@@ -22,6 +24,19 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
     isActivated: false,
     isWaiting: false,
   });
+
+  // Check authentication status on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   class Particle {
     x: number;
@@ -101,6 +116,12 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
   }
 
   const triggerKamui = useCallback(() => {
+    // If not authenticated, redirect to auth page first
+    if (!isAuthenticated) {
+      navigate("/auth", { state: { returnTo: "/repository" } });
+      return;
+    }
+
     const state = stateRef.current;
     const canvas = canvasRef.current;
     const btn = btnRef.current;
@@ -134,7 +155,7 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
     for (let i = 0; i < 550; i++) {
       state.particles.push(new Particle(0, 0, false, width, height));
     }
-  }, []);
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
