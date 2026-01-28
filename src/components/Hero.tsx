@@ -3,28 +3,28 @@ import { Sparkles } from "lucide-react";
 const Hero = () => {
   return (
     <section className="relative pt-16 pb-24 px-4 text-center overflow-hidden">
-      {/* 3D Perspective Grid - matching reference image */}
+      {/* 3D Perspective Grid - ramp effect from top-right to bottom-left */}
       <div 
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none overflow-hidden"
         style={{
-          perspective: '1000px',
-          perspectiveOrigin: '100% 50%',
+          perspective: '1200px',
+          perspectiveOrigin: '100% 0%',
         }}
       >
         <div 
-          className="absolute w-[200%] h-[200%]"
+          className="absolute w-[250%] h-[250%]"
           style={{
-            top: '-50%',
-            right: '-50%',
-            transform: 'rotateX(60deg) rotateZ(-45deg)',
-            transformOrigin: 'center center',
+            top: '-80%',
+            right: '-60%',
+            transform: 'rotateX(70deg) rotateZ(-50deg)',
+            transformOrigin: 'top right',
             background: `
-              linear-gradient(90deg, rgba(180, 140, 80, 0.25) 1px, transparent 1px),
-              linear-gradient(rgba(180, 140, 80, 0.25) 1px, transparent 1px)
+              linear-gradient(90deg, rgba(180, 140, 80, 0.35) 1px, transparent 1px),
+              linear-gradient(rgba(180, 140, 80, 0.35) 1px, transparent 1px)
             `,
-            backgroundSize: '50px 50px',
-            maskImage: 'radial-gradient(ellipse 80% 80% at 70% 50%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, transparent 70%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 70% 50%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, transparent 70%)',
+            backgroundSize: '45px 45px',
+            maskImage: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 60%, transparent 80%)',
+            WebkitMaskImage: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 60%, transparent 80%)',
           }}
         />
       </div>
