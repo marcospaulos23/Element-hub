@@ -136,11 +136,11 @@ const ManageElementsSheet = ({
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0 mr-2">
-                    <h4 className="font-medium text-foreground" title={element.name}>
+                  <div className="flex-1 min-w-0 mr-2 overflow-hidden">
+                    <h4 className="font-medium text-foreground truncate" title={element.name}>
                       {truncateName(element.name)}
                     </h4>
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="text-sm text-muted-foreground truncate" title={displayCategories(element.category)}>
                       {displayCategories(element.category)}
                     </p>
                   </div>
