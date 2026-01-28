@@ -36,6 +36,11 @@ const CodePreview = ({ code, className = "", fillContainer = false, lightBackgro
             }
             #scaler {
               transform-origin: center center;
+              opacity: 0;
+              transition: opacity 0.2s ease-out;
+            }
+            #scaler.ready {
+              opacity: 1;
             }
             #content {
               display: flex;
@@ -106,6 +111,7 @@ const CodePreview = ({ code, className = "", fillContainer = false, lightBackgro
               const scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.3), ${fillContainer ? 3.0 : 1.2});
               
               scaler.style.transform = 'scale(' + scale + ')';
+              scaler.classList.add('ready');
             }
 
             // Função para reiniciar todas as animações
