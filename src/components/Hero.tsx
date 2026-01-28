@@ -2,44 +2,14 @@ import { Sparkles } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative pt-16 pb-24 px-4 text-center overflow-hidden">
-      {/* Perspective grid background - asymmetric layout like reference image */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Top-left grid - large, filling the corner */}
+    <section className="relative pt-16 pb-24 px-4 text-center">
+      {/* Large circular glow effect - soft white to black gradient */}
+      <div className="fixed inset-0 pointer-events-none -z-10 flex items-start justify-center">
         <div 
-          className="absolute -top-[40%] -left-[30%] w-[120%] h-[120%]"
+          className="w-[1200px] h-[1200px] rounded-full"
           style={{
-            backgroundImage: `
-              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '35px 35px',
-            transform: 'perspective(600px) rotateX(55deg) rotateZ(-20deg)',
-            transformOrigin: 'bottom right',
-            maskImage: 'radial-gradient(ellipse 70% 70% at 80% 80%, transparent 10%, black 50%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 80% 80%, transparent 10%, black 50%)',
-          }}
-        />
-        {/* Bottom-right grid - large, filling the corner */}
-        <div 
-          className="absolute -bottom-[40%] -right-[30%] w-[120%] h-[120%]"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '35px 35px',
-            transform: 'perspective(600px) rotateX(-55deg) rotateZ(-20deg)',
-            transformOrigin: 'top left',
-            maskImage: 'radial-gradient(ellipse 70% 70% at 20% 20%, transparent 10%, black 50%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 20% 20%, transparent 10%, black 50%)',
-          }}
-        />
-        {/* Center fade overlay - clear area for title */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse 45% 40% at 50% 50%, hsl(var(--background)) 0%, hsl(var(--background) / 0.9) 60%, transparent 100%)',
+            marginTop: '-200px',
+            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 30%, rgba(0, 0, 0, 0) 60%)',
           }}
         />
       </div>
