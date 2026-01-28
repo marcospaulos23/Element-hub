@@ -5,10 +5,10 @@ const Home = () => {
   const [isAnimating, setIsAnimating] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className="min-h-screen bg-background overflow-hidden flex items-center justify-center">
       <KamuiButton onAnimationStart={() => setIsAnimating(true)}>
         <div 
-          className={`max-w-xl transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
+          className={`max-w-xl text-center transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
         >
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6">
             Element Hub
