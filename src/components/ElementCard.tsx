@@ -2,6 +2,7 @@ import { useState, memo } from "react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 import { Sparkles } from "lucide-react";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 interface ElementCardProps {
   element: UIElement;
@@ -10,6 +11,10 @@ interface ElementCardProps {
 
 const ElementCard = ({ element, onClick }: ElementCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [cardRef, isVisible] = useIntersectionObserver<HTMLDivElement>({
+    rootMargin: "200px", // Start loading 200px before entering viewport
+    freezeOnceVisible: true, // Keep loaded once visible
+  });
 
   const allCategories = Array.isArray(element.category) ? element.category : [element.category];
   
@@ -53,6 +58,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
 
   return (
     <div
+      ref={cardRef}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -69,17 +75,30 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
 
       {/* Code Preview / Image */}
       <div className={`relative aspect-[16/10] overflow-hidden ${previewContainerBg}`}>
-        {/* Always render CodePreview but hide it when showing preview image */}
-        <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
-          <CodePreview code={element.code} className="w-full h-full" fillContainer={needsFullScale} lightBackground={hasLightBackground} />
-        </div>
-        {hasPreviewImage && (
-          <img
-            src={element.preview_image!}
-            alt={element.name}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? "opacity-0 pointer-events-none" : "opacity-100"}`}
-          />
+        {/* Skeleton placeholder while not visible */}
+        {!isVisible && (
+          <div className="absolute inset-0 bg-muted/50 animate-pulse flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground/60 animate-spin" />
+          </div>
         )}
+        
+        {/* Only render CodePreview when visible in viewport */}
+        {isVisible && (
+          <>
+            {/* Always render CodePreview but hide it when showing preview image */}
+            <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
+              <CodePreview code={element.code} className="w-full h-full" fillContainer={needsFullScale} lightBackground={hasLightBackground} />
+            </div>
+            {hasPreviewImage && (
+              <img
+                src={element.preview_image!}
+                alt={element.name}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+              />
+            )}
+          </>
+        )}
+        
         {!hasLightBackground && (
           <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
         )}
