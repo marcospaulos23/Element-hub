@@ -1,4 +1,4 @@
-import { Home, BookOpen, Settings, HelpCircle, PanelLeft, Sparkles, FolderPlus, LayoutGrid, FolderEdit } from "lucide-react";
+import { Home, BookOpen, Settings, PanelLeft, Sparkles, FolderPlus, LayoutGrid, FolderEdit } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -27,13 +27,12 @@ const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements }: App
 
   const mainNavItems = [
     { title: "Início", icon: Home, href: "/", isRoute: true },
-    { title: "Como Utilizar", icon: BookOpen, href: "#guide", isRoute: false },
-    { title: "Novidades", icon: Sparkles, href: "#news", isRoute: false },
+    { title: "Como Utilizar", icon: BookOpen, href: "/how-to-use", isRoute: true },
+    { title: "Novidades", icon: Sparkles, href: "/whats-new", isRoute: true },
   ];
 
   const secondaryNavItems = [
-    { title: "Configurações", icon: Settings, href: "#settings" },
-    { title: "Ajuda", icon: HelpCircle, href: "#help" },
+    { title: "Configurações", icon: Settings, href: "/settings", isRoute: true },
   ];
 
   return (
@@ -139,10 +138,10 @@ const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements }: App
                     asChild
                     tooltip={item.title}
                   >
-                    <a href={item.href}>
+                    <Link to={item.href}>
                       <item.icon className="h-4 w-4" />
                       {!isCollapsed && <span>{item.title}</span>}
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
