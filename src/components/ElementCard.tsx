@@ -42,8 +42,9 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   );
   const hasPreviewImage = usePreviewImageEnabled && isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
   
-  // Check if this is the special Kamui element that needs full container scaling
-  const isKamuiElement = element.name.toLowerCase().includes("kamui");
+  // Check if this element needs full container scaling (Kamui or Fundo 3D)
+  const needsFullScale = element.name.toLowerCase().includes("kamui") || 
+                         element.name.toLowerCase().includes("fundo 3d");
   
   // Use light background from element property
   const hasLightBackground = element.light_background === true;
@@ -70,7 +71,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       <div className={`relative aspect-[16/10] overflow-hidden ${previewContainerBg}`}>
         {/* Always render CodePreview but hide it when showing preview image */}
         <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
-          <CodePreview code={element.code} className="w-full h-full" fillContainer={isKamuiElement} lightBackground={hasLightBackground} />
+          <CodePreview code={element.code} className="w-full h-full" fillContainer={needsFullScale} lightBackground={hasLightBackground} />
         </div>
         {hasPreviewImage && (
           <img
