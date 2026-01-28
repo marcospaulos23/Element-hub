@@ -18,11 +18,11 @@ const Home = () => {
         }}
       />
       
-      {/* Red glow at bottom */}
+      {/* White glow behind content */}
       <div
-        className="absolute inset-x-0 bottom-0 h-[60%] pointer-events-none"
+        className="absolute inset-0 pointer-events-none flex items-center justify-center"
         style={{
-          background: "radial-gradient(ellipse 80% 50% at 50% 100%, rgba(220, 38, 38, 0.25) 0%, rgba(220, 38, 38, 0.1) 40%, transparent 70%)",
+          background: "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 40%, transparent 70%)",
         }}
       />
       <KamuiButton onAnimationStart={() => setIsAnimating(true)}>
