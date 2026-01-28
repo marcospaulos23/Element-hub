@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Copy, MousePointerClick, Search, FolderOpen, Code2, Sparkles } from "lucide-react";
+import { ArrowLeft, Copy, MousePointerClick, Search, Code2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const HowToUse = () => {
@@ -23,16 +23,6 @@ const HowToUse = () => {
       icon: Copy,
       title: "4. Copie e Use",
       description: "Clique no botão 'Copiar Código' para copiar o código para a área de transferência. Cole diretamente no seu projeto!"
-    },
-    {
-      icon: FolderOpen,
-      title: "5. Gerencie Elementos",
-      description: "Use a barra lateral para adicionar novos elementos, criar categorias ou gerenciar os existentes através das opções de administração."
-    },
-    {
-      icon: Sparkles,
-      title: "6. Personalize",
-      description: "Todos os elementos são customizáveis! Modifique cores, tamanhos e animações no seu código para se adaptar ao seu projeto."
     }
   ];
 
