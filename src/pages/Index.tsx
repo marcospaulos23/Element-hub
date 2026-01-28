@@ -44,7 +44,7 @@ const Index = () => {
 
   // Pinned elements per category (element name -> position in that category)
   const pinnedElements: Record<string, string[]> = {
-    "Fundo de Página": ["Caminho Colorido", "Circulo colorido", "Super Herói"],
+    "Fundo de Pagina": ["Caminho Colorido", "Circulo colorido", "Super Herói"],
   };
 
   // Group elements by category, sorted by creation date (oldest first, newest last)
