@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Camera, Loader2, LogOut, Save, User, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +20,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+// Email do administrador autorizado
+const ADMIN_EMAIL = "marcoscorporation23@gmail.com";
+
 const Settings = () => {
   const navigate = useNavigate();
   const { user, profile, loading, signOut, updateProfile, uploadAvatar } = useAuth();
@@ -29,7 +31,9 @@ const Settings = () => {
   const [displayName, setDisplayName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Verifica se é admin pelo email
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   // Redirect if not logged in
   useEffect(() => {
@@ -38,28 +42,12 @@ const Settings = () => {
     }
   }, [user, loading, navigate]);
 
-  // Load profile data and check admin status
+  // Load profile data
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || "");
     }
-    
-    const checkAdmin = async () => {
-      if (!user) return;
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      
-      setIsAdmin(!!data);
-    };
-    
-    if (user) {
-      checkAdmin();
-    }
-  }, [profile, user]);
+  }, [profile]);
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
