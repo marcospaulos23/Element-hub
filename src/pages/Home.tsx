@@ -22,7 +22,7 @@ const Home = () => {
       <div
         className="absolute inset-0 pointer-events-none flex items-center justify-center"
         style={{
-          background: "radial-gradient(circle 45vw at 50% 50%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 30%, rgba(255, 255, 255, 0.03) 60%, transparent 100%)",
+          background: "radial-gradient(circle 70vw at 50% 50%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.04) 50%, transparent 100%)",
         }}
       />
       <KamuiButton onAnimationStart={() => setIsAnimating(true)}>
