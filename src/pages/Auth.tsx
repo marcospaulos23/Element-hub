@@ -124,7 +124,8 @@ const Auth = () => {
     setIsSubmitting(false);
     
     if (!error) {
-      navigate(returnTo);
+      // Redirect to pending page after signup
+      navigate("/access-pending");
     }
   };
 
