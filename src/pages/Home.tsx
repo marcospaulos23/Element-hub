@@ -11,14 +11,18 @@ const Home = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(hsl(var(--foreground) / 0.06) 1px, transparent 1px),
-            linear-gradient(90deg, hsl(var(--foreground) / 0.06) 1px, transparent 1px)
+            linear-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(var(--foreground) / 0.08) 1px, transparent 1px)
           `,
           backgroundSize: "56px 56px",
-          maskImage:
-            "radial-gradient(circle at center, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)",
-          WebkitMaskImage:
-            "radial-gradient(circle at center, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)",
+        }}
+      />
+      
+      {/* Red glow at bottom */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[60%] pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 80% 50% at 50% 100%, rgba(220, 38, 38, 0.25) 0%, rgba(220, 38, 38, 0.1) 40%, transparent 70%)",
         }}
       />
       <KamuiButton onAnimationStart={() => setIsAnimating(true)}>
