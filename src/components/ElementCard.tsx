@@ -96,11 +96,11 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
 
       {/* Info */}
       <div className="p-4">
-        <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div className="flex flex-wrap items-center gap-1.5 mb-3">
           {categories.map((cat, index) => (
             <span 
               key={index}
-              className="text-xs font-medium px-3 py-1 rounded-full bg-muted text-muted-foreground border border-border font-['Space_Grotesk']"
+              className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground border border-border font-['Space_Grotesk']"
             >
               {cat}
             </span>
