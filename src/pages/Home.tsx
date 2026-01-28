@@ -5,7 +5,18 @@ const Home = () => {
   const [isAnimating, setIsAnimating] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen bg-background overflow-hidden flex items-center justify-center relative">
+      {/* Grid background */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px',
+        }}
+      />
       <KamuiButton onAnimationStart={() => setIsAnimating(true)}>
         <div 
           className={`max-w-xl text-center transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
