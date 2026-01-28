@@ -140,9 +140,13 @@ const ManageElementsSheet = ({
                     <h4 className="font-medium text-foreground truncate" title={element.name}>
                       {truncateName(element.name)}
                     </h4>
-                    <p className="text-sm text-muted-foreground truncate" title={displayCategories(element.category)}>
-                      {displayCategories(element.category)}
-                    </p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {(Array.isArray(element.category) ? element.category : [element.category]).map((cat, idx) => (
+                        <span key={idx} className="text-[10px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
