@@ -119,7 +119,7 @@ const ManageElementsSheet = ({
               filteredElements.map((element) => (
                 <div
                   key={element.id}
-                  className="flex items-center p-3 pr-6 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                  className="flex items-center p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                 >
                   {/* Element Preview - Show image if available, otherwise code preview */}
                   <div className="w-12 h-10 rounded-md overflow-hidden border border-border bg-muted/30 flex-shrink-0 flex items-center justify-center mr-3">
@@ -136,7 +136,7 @@ const ManageElementsSheet = ({
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0 mr-2 overflow-hidden">
+                  <div className="flex-1 min-w-0 mr-3" style={{ maxWidth: 'calc(100% - 140px)' }}>
                     <h4 className="font-medium text-foreground truncate" title={element.name}>
                       {truncateName(element.name)}
                     </h4>
@@ -145,7 +145,7 @@ const ManageElementsSheet = ({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1 flex-shrink-0">
+                  <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
                     <button
                       onClick={() => {
                         onClose();
