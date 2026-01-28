@@ -5,41 +5,41 @@ const Hero = () => {
     <section className="relative pt-16 pb-24 px-4 text-center overflow-hidden">
       {/* Perspective grid background - asymmetric layout like reference image */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Top-left grid - converging towards center-right */}
+        {/* Top-left grid - large, filling the corner */}
         <div 
-          className="absolute -top-[10%] -left-[10%] w-[70%] h-[70%]"
+          className="absolute -top-[40%] -left-[30%] w-[120%] h-[120%]"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
+              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
             `,
-            backgroundSize: '40px 40px',
-            transform: 'perspective(500px) rotateX(60deg) rotateZ(-15deg)',
+            backgroundSize: '35px 35px',
+            transform: 'perspective(600px) rotateX(55deg) rotateZ(-20deg)',
             transformOrigin: 'bottom right',
-            maskImage: 'radial-gradient(ellipse 100% 100% at 100% 100%, transparent 20%, black 60%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 100% 100% at 100% 100%, transparent 20%, black 60%)',
+            maskImage: 'radial-gradient(ellipse 70% 70% at 80% 80%, transparent 10%, black 50%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 80% 80%, transparent 10%, black 50%)',
           }}
         />
-        {/* Bottom-right grid - converging towards center-left */}
+        {/* Bottom-right grid - large, filling the corner */}
         <div 
-          className="absolute -bottom-[10%] -right-[10%] w-[70%] h-[70%]"
+          className="absolute -bottom-[40%] -right-[30%] w-[120%] h-[120%]"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
+              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
             `,
-            backgroundSize: '40px 40px',
-            transform: 'perspective(500px) rotateX(-60deg) rotateZ(-15deg)',
+            backgroundSize: '35px 35px',
+            transform: 'perspective(600px) rotateX(-55deg) rotateZ(-20deg)',
             transformOrigin: 'top left',
-            maskImage: 'radial-gradient(ellipse 100% 100% at 0% 0%, transparent 20%, black 60%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 100% 100% at 0% 0%, transparent 20%, black 60%)',
+            maskImage: 'radial-gradient(ellipse 70% 70% at 20% 20%, transparent 10%, black 50%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 20% 20%, transparent 10%, black 50%)',
           }}
         />
-        {/* Center fade overlay - larger clear area */}
+        {/* Center fade overlay - clear area for title */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 60% 55% at 50% 50%, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 50%, transparent 80%)',
+            background: 'radial-gradient(ellipse 45% 40% at 50% 50%, hsl(var(--background)) 0%, hsl(var(--background) / 0.9) 60%, transparent 100%)',
           }}
         />
       </div>
