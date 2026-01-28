@@ -19,44 +19,34 @@ interface UserProfile {
   email?: string;
 }
 
+// Email do administrador autorizado
+const ADMIN_EMAIL = "marcoscorporation23@gmail.com";
+
 const AdminUsers = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
+  // Verifica se o usuário é admin pelo email
+  const isAdmin = user?.email === ADMIN_EMAIL;
+
   useEffect(() => {
-    const checkAdminAndFetch = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      // Check if user is admin
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-
-      if (!roleData) {
-        setIsAdmin(false);
-        setLoading(false);
-        return;
-      }
-
-      setIsAdmin(true);
-      await fetchUsers();
-    };
-
+    // Redireciona imediatamente se não for admin
     if (!authLoading) {
-      checkAdminAndFetch();
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+      if (user.email !== ADMIN_EMAIL) {
+        navigate("/repository");
+        return;
+      }
+      fetchUsers();
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, navigate]);
 
   const fetchUsers = async () => {
     setLoading(true);
