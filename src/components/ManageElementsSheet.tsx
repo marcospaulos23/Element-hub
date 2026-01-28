@@ -75,11 +75,29 @@ const ManageElementsSheet = ({
     return cats.join(", ");
   };
 
-  // Helper to truncate name to first 2 words
+  // Helper to truncate name - show first word + second word (truncated if too long)
   const truncateName = (name: string) => {
     const words = name.split(" ");
-    if (words.length <= 2) return name;
-    return words.slice(0, 2).join(" ") + "...";
+    if (words.length === 1) {
+      // Single word - truncate if too long
+      if (words[0].length > 15) {
+        return words[0].slice(0, 12) + "...";
+      }
+      return words[0];
+    }
+    
+    const firstWord = words[0];
+    let secondWord = words[1];
+    
+    // If second word is too long, truncate it
+    if (secondWord.length > 10) {
+      secondWord = secondWord.slice(0, 7) + "...";
+    }
+    
+    // If there are more than 2 words, indicate with "..."
+    const suffix = words.length > 2 ? "..." : "";
+    
+    return `${firstWord} ${secondWord}${suffix}`;
   };
 
   return (
