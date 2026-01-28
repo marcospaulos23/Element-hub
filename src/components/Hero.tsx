@@ -3,43 +3,43 @@ import { Sparkles } from "lucide-react";
 const Hero = () => {
   return (
     <section className="relative pt-16 pb-24 px-4 text-center overflow-hidden">
-      {/* Perspective grid background - asymmetric layout */}
+      {/* Perspective grid background - asymmetric layout like reference image */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Top-left grid - perspective from top-left corner */}
+        {/* Top-left grid - converging towards center-right */}
         <div 
-          className="absolute -top-[20%] -left-[20%] w-[80%] h-[80%]"
+          className="absolute -top-[10%] -left-[10%] w-[70%] h-[70%]"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px)
+              linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
             `,
-            backgroundSize: '50px 50px',
-            transform: 'perspective(400px) rotateX(50deg) rotateZ(-10deg)',
-            transformOrigin: 'center bottom',
-            maskImage: 'radial-gradient(ellipse 80% 80% at 100% 100%, transparent 30%, black 70%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 100% 100%, transparent 30%, black 70%)',
+            backgroundSize: '40px 40px',
+            transform: 'perspective(500px) rotateX(60deg) rotateZ(-15deg)',
+            transformOrigin: 'bottom right',
+            maskImage: 'radial-gradient(ellipse 100% 100% at 100% 100%, transparent 20%, black 60%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 100% 100% at 100% 100%, transparent 20%, black 60%)',
           }}
         />
-        {/* Bottom-right grid - perspective from bottom-right corner */}
+        {/* Bottom-right grid - converging towards center-left */}
         <div 
-          className="absolute -bottom-[20%] -right-[20%] w-[80%] h-[80%]"
+          className="absolute -bottom-[10%] -right-[10%] w-[70%] h-[70%]"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px)
+              linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
             `,
-            backgroundSize: '50px 50px',
-            transform: 'perspective(400px) rotateX(-50deg) rotateZ(-10deg)',
-            transformOrigin: 'center top',
-            maskImage: 'radial-gradient(ellipse 80% 80% at 0% 0%, transparent 30%, black 70%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 0% 0%, transparent 30%, black 70%)',
+            backgroundSize: '40px 40px',
+            transform: 'perspective(500px) rotateX(-60deg) rotateZ(-15deg)',
+            transformOrigin: 'top left',
+            maskImage: 'radial-gradient(ellipse 100% 100% at 0% 0%, transparent 20%, black 60%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 100% 100% at 0% 0%, transparent 20%, black 60%)',
           }}
         />
-        {/* Center fade overlay */}
+        {/* Center fade overlay - larger clear area */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 50% 50% at 50% 50%, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 40%, transparent 70%)',
+            background: 'radial-gradient(ellipse 60% 55% at 50% 50%, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 50%, transparent 80%)',
           }}
         />
       </div>
