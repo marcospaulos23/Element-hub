@@ -8,18 +8,23 @@ export function cleanHtmlCode(code: string): string {
   }
 
   const trimmedCode = code.trim();
+  console.log('[cleanHtmlCode] Input length:', trimmedCode.length);
 
   // Check if it's a full HTML document
   const hasDoctype = /<!DOCTYPE\s+html/i.test(trimmedCode);
   const hasHtmlTag = /<html[\s>]/i.test(trimmedCode);
   
+  console.log('[cleanHtmlCode] Has DOCTYPE:', hasDoctype, 'Has HTML tag:', hasHtmlTag);
+  
   if (!hasDoctype && !hasHtmlTag) {
     // Not a full document, return as-is
+    console.log('[cleanHtmlCode] Not a full document, returning as-is');
     return trimmedCode;
   }
 
   // Extract content from body tag
   const bodyMatch = trimmedCode.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  console.log('[cleanHtmlCode] Body match found:', !!bodyMatch);
   
   if (bodyMatch && bodyMatch[1]) {
     let bodyContent = bodyMatch[1].trim();
@@ -43,9 +48,12 @@ export function cleanHtmlCode(code: string): string {
     
     // Combine styles with body content
     if (styleTags) {
-      return styleTags + '\n' + bodyContent;
+      const result = styleTags + '\n' + bodyContent;
+      console.log('[cleanHtmlCode] Result with styles, length:', result.length);
+      return result;
     }
     
+    console.log('[cleanHtmlCode] Result body only, length:', bodyContent.length);
     return bodyContent;
   }
 
