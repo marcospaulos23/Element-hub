@@ -156,10 +156,18 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
       const width = canvas.width;
       const height = canvas.height;
 
-        // When idle, keep canvas transparent so page backgrounds (like the grid) remain visible.
-        if (!state.isActivated) {
+        // When idle and not waiting for navigation, keep canvas transparent
+        if (!state.isActivated && !state.isWaiting) {
           ctx.clearRect(0, 0, width, height);
           canvas.style.transform = "";
+          animationRef.current = requestAnimationFrame(animate);
+          return;
+        }
+        
+        // When waiting for navigation, keep screen black
+        if (state.isWaiting) {
+          ctx.fillStyle = "rgba(0, 0, 0, 1)";
+          ctx.fillRect(0, 0, width, height);
           animationRef.current = requestAnimationFrame(animate);
           return;
         }
