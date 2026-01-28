@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Check, X, ArrowLeft, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, ArrowLeft, Shield, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
+import UserDetailsModal from "@/components/admin/UserDetailsModal";
+import PendingUserCard from "@/components/admin/PendingUserCard";
+import ApprovedUserCard from "@/components/admin/ApprovedUserCard";
 
 interface UserProfile {
   id: string;
@@ -29,6 +32,8 @@ const AdminUsers = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   // Verifica se o usuário é admin pelo email
   const isAdmin = user?.email === ADMIN_EMAIL;
@@ -47,6 +52,37 @@ const AdminUsers = () => {
       fetchUsers();
     }
   }, [user, authLoading, navigate]);
+
+  // Realtime subscription para novos usuários pendentes
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const channel = supabase
+      .channel('pending-users')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'profiles',
+          filter: 'is_approved=eq.false'
+        },
+        (payload) => {
+          const newUser = payload.new as UserProfile;
+          toast({
+            title: "🔔 Nova solicitação de acesso!",
+            description: `${newUser.display_name || "Novo usuário"} solicitou acesso ao repositório.`,
+          });
+          // Atualiza a lista de usuários
+          fetchUsers();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin, toast]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -93,6 +129,37 @@ const AdminUsers = () => {
     }
     
     setProcessingId(null);
+  };
+
+  const handleReject = async (userId: string) => {
+    setProcessingId(userId);
+    
+    // Deleta o perfil do usuário rejeitado
+    const { error } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("user_id", userId);
+
+    if (error) {
+      toast({
+        title: "Erro ao rejeitar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Usuário rejeitado",
+        description: "A solicitação de acesso foi rejeitada.",
+      });
+      await fetchUsers();
+    }
+    
+    setProcessingId(null);
+  };
+
+  const handleUserClick = (profile: UserProfile) => {
+    setSelectedUser(profile);
+    setDetailsOpen(true);
   };
 
   if (authLoading || loading) {
@@ -145,11 +212,21 @@ const AdminUsers = () => {
           Voltar às Configurações
         </Link>
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
-          <p className="text-muted-foreground mt-1">
-            Aprove ou revogue acesso dos usuários ao repositório
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
+            <p className="text-muted-foreground mt-1">
+              Aprove ou revogue acesso dos usuários ao repositório
+            </p>
+          </div>
+          {pendingUsers.length > 0 && (
+            <div className="flex items-center gap-2 text-primary">
+              <Bell className="w-5 h-5 animate-pulse" />
+              <span className="text-sm font-medium">
+                {pendingUsers.length} pendente{pendingUsers.length > 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Pending Users */}
@@ -173,51 +250,14 @@ const AdminUsers = () => {
             ) : (
               <div className="space-y-3">
                 {pendingUsers.map((profile) => (
-                  <div 
-                    key={profile.id} 
-                    className="flex items-center justify-between p-4 rounded-lg border bg-card"
-                  >
-                    <div className="flex items-center gap-3">
-                      {profile.avatar_url ? (
-                        <img 
-                          src={profile.avatar_url} 
-                          alt="" 
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="text-primary font-medium">
-                            {(profile.display_name || "U")[0].toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-medium">
-                          {profile.display_name || "Sem nome"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(profile.created_at).toLocaleDateString("pt-BR")}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleApproval(profile.user_id, true)}
-                        disabled={processingId === profile.user_id}
-                      >
-                        {processingId === profile.user_id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <>
-                            <Check className="w-4 h-4 mr-1" />
-                            Aprovar
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
+                  <PendingUserCard
+                    key={profile.id}
+                    profile={profile}
+                    processingId={processingId}
+                    onApprove={(userId) => handleApproval(userId, true)}
+                    onReject={handleReject}
+                    onClick={() => handleUserClick(profile)}
+                  />
                 ))}
               </div>
             )}
@@ -243,58 +283,26 @@ const AdminUsers = () => {
             ) : (
               <div className="space-y-3">
                 {approvedUsers.map((profile) => (
-                  <div 
-                    key={profile.id} 
-                    className="flex items-center justify-between p-4 rounded-lg border bg-card"
-                  >
-                    <div className="flex items-center gap-3">
-                      {profile.avatar_url ? (
-                        <img 
-                          src={profile.avatar_url} 
-                          alt="" 
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="text-primary font-medium">
-                            {(profile.display_name || "U")[0].toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-medium">
-                          {profile.display_name || "Sem nome"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(profile.created_at).toLocaleDateString("pt-BR")}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => handleApproval(profile.user_id, false)}
-                        disabled={processingId === profile.user_id}
-                      >
-                        {processingId === profile.user_id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <>
-                            <X className="w-4 h-4 mr-1" />
-                            Revogar
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
+                  <ApprovedUserCard
+                    key={profile.id}
+                    profile={profile}
+                    processingId={processingId}
+                    onRevoke={(userId) => handleApproval(userId, false)}
+                    onClick={() => handleUserClick(profile)}
+                  />
                 ))}
               </div>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* User Details Modal */}
+      <UserDetailsModal
+        user={selectedUser}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
     </div>
   );
 };
