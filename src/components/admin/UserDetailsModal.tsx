@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +7,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { User, Calendar, Mail, Shield } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { User, Calendar, Mail, Shield, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserProfile {
   id: string;
@@ -24,7 +27,43 @@ interface UserDetailsModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+interface UserAuthData {
+  email: string;
+  created_at: string;
+  last_sign_in_at: string | null;
+}
+
 const UserDetailsModal = ({ user, open, onOpenChange }: UserDetailsModalProps) => {
+  const [authData, setAuthData] = useState<UserAuthData | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open && user) {
+      fetchUserAuthData(user.user_id);
+    } else {
+      setAuthData(null);
+    }
+  }, [open, user]);
+
+  const fetchUserAuthData = async (userId: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('get-user-email', {
+        body: { user_id: userId }
+      });
+
+      if (error) {
+        console.error('Error fetching user auth data:', error);
+      } else {
+        setAuthData(data);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -73,15 +112,18 @@ const UserDetailsModal = ({ user, open, onOpenChange }: UserDetailsModalProps) =
               </div>
             </div>
 
-            {user.email && (
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Mail className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="text-xs text-muted-foreground">E-mail</p>
-                  <p className="font-medium">{user.email}</p>
-                </div>
+            {/* Email from auth */}
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+              <Mail className="w-5 h-5 text-muted-foreground" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">E-mail</p>
+                {loading ? (
+                  <Skeleton className="h-5 w-48" />
+                ) : (
+                  <p className="font-medium">{authData?.email || "Não disponível"}</p>
+                )}
               </div>
-            )}
+            </div>
 
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
               <Calendar className="w-5 h-5 text-muted-foreground" />
@@ -96,6 +138,29 @@ const UserDetailsModal = ({ user, open, onOpenChange }: UserDetailsModalProps) =
                     minute: "2-digit"
                   })}
                 </p>
+              </div>
+            </div>
+
+            {/* Last sign in */}
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+              <Clock className="w-5 h-5 text-muted-foreground" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">Último Acesso</p>
+                {loading ? (
+                  <Skeleton className="h-5 w-40" />
+                ) : authData?.last_sign_in_at ? (
+                  <p className="font-medium">
+                    {new Date(authData.last_sign_in_at).toLocaleDateString("pt-BR", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    })}
+                  </p>
+                ) : (
+                  <p className="font-medium text-muted-foreground">Nunca acessou</p>
+                )}
               </div>
             </div>
 
