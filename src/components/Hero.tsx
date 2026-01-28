@@ -2,35 +2,9 @@ import { Sparkles } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative pt-16 pb-24 px-4 text-center overflow-hidden">
-      {/* 3D Perspective Grid - ramp effect from top-right to bottom-left */}
-      <div 
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        style={{
-          perspective: '1200px',
-          perspectiveOrigin: '100% 0%',
-        }}
-      >
-        <div 
-          className="absolute w-[250%] h-[250%]"
-          style={{
-            top: '-80%',
-            right: '-60%',
-            transform: 'rotateX(70deg) rotateZ(-50deg)',
-            transformOrigin: 'top right',
-            background: `
-              linear-gradient(90deg, rgba(180, 140, 80, 0.35) 1px, transparent 1px),
-              linear-gradient(rgba(180, 140, 80, 0.35) 1px, transparent 1px)
-            `,
-            backgroundSize: '45px 45px',
-            maskImage: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 60%, transparent 80%)',
-            WebkitMaskImage: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 60%, transparent 80%)',
-          }}
-        />
-      </div>
-
+    <section className="relative pt-16 pb-24 px-4 text-center">
       {/* Large circular glow effect - soft white to black gradient */}
-      <div className="absolute inset-0 pointer-events-none flex items-start justify-center">
+      <div className="fixed inset-0 pointer-events-none -z-10 flex items-start justify-center">
         <div 
           className="w-[1200px] h-[1200px] rounded-full"
           style={{
