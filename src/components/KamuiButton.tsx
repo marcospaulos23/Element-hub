@@ -151,16 +151,23 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    const animate = () => {
+      const animate = () => {
       const state = stateRef.current;
       const width = canvas.width;
       const height = canvas.height;
 
-      const trailOpacity = state.isEnding ? 0.4 : 0.2;
-      ctx.fillStyle = `rgba(0, 0, 0, ${trailOpacity})`;
-      ctx.fillRect(0, 0, width, height);
+        // When idle, keep canvas transparent so page backgrounds (like the grid) remain visible.
+        if (!state.isActivated) {
+          ctx.clearRect(0, 0, width, height);
+          canvas.style.transform = "";
+          animationRef.current = requestAnimationFrame(animate);
+          return;
+        }
 
-      if (state.isActivated) {
+        const trailOpacity = state.isEnding ? 0.4 : 0.2;
+        ctx.fillStyle = `rgba(0, 0, 0, ${trailOpacity})`;
+        ctx.fillRect(0, 0, width, height);
+
         if (state.isEnding) {
           state.zoomAcceleration *= 1.025;
           state.zoomScale *= state.zoomAcceleration;
@@ -190,7 +197,6 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
             navigate("/repository");
           }, 400);
         }
-      }
 
       animationRef.current = requestAnimationFrame(animate);
     };
