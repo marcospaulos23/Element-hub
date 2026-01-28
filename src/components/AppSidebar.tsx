@@ -15,15 +15,20 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+// Email do administrador - apenas este email verá as opções de gerenciamento
+const ADMIN_EMAIL = "marcoscorporation23@gmail.com";
+
 interface AppSidebarProps {
   onAddCategory: () => void;
   onManageCategories: () => void;
   onManageElements: () => void;
+  userEmail?: string | null;
 }
 
-const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements }: AppSidebarProps) => {
+const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements, userEmail }: AppSidebarProps) => {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const isAdmin = userEmail === ADMIN_EMAIL;
 
   const mainNavItems = [
     { title: "Início", icon: Home, href: "/", isRoute: true },
@@ -56,45 +61,49 @@ const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements }: App
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Action Buttons */}
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={onAddCategory}
-                  tooltip="Adicionar Categoria"
-                  className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
-                >
-                  <FolderPlus className="h-4 w-4" />
-                  {!isCollapsed && <span>Adicionar Categoria</span>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={onManageCategories}
-                  tooltip="Editar Categorias"
-                  className="bg-secondary hover:bg-secondary/80 text-foreground border border-border"
-                >
-                  <FolderEdit className="h-4 w-4" />
-                  {!isCollapsed && <span>Editar Categorias</span>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={onManageElements}
-                  tooltip="Gerenciar Elementos"
-                  className="bg-secondary hover:bg-secondary/80 text-foreground border border-border"
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                  {!isCollapsed && <span>Gerenciar Elementos</span>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/* Action Buttons - Only visible to admin */}
+        {isAdmin && (
+          <>
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={onAddCategory}
+                      tooltip="Adicionar Categoria"
+                      className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
+                    >
+                      <FolderPlus className="h-4 w-4" />
+                      {!isCollapsed && <span>Adicionar Categoria</span>}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={onManageCategories}
+                      tooltip="Editar Categorias"
+                      className="bg-secondary hover:bg-secondary/80 text-foreground border border-border"
+                    >
+                      <FolderEdit className="h-4 w-4" />
+                      {!isCollapsed && <span>Editar Categorias</span>}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={onManageElements}
+                      tooltip="Gerenciar Elementos"
+                      className="bg-secondary hover:bg-secondary/80 text-foreground border border-border"
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                      {!isCollapsed && <span>Gerenciar Elementos</span>}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-        <SidebarSeparator />
+            <SidebarSeparator />
+          </>
+        )}
 
         {/* Main Navigation */}
         <SidebarGroup>

@@ -188,6 +188,9 @@ const Index = () => {
     );
   }
 
+  // Email do administrador
+  const isAdmin = user?.email === "marcoscorporation23@gmail.com";
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
@@ -196,22 +199,25 @@ const Index = () => {
           onAddCategory={() => setIsAddCategoryModalOpen(true)} 
           onManageCategories={() => setIsManageCategoriesSheetOpen(true)}
           onManageElements={() => setIsManageSheetOpen(true)}
+          userEmail={user?.email}
         />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Top Header with Add Element Button */}
-          <header className="sticky top-0 z-40">
-            <div className="flex items-center justify-end px-4 py-3">
-              <Button
-                onClick={() => setIsAddModalOpen(true)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar Elemento
-              </Button>
-            </div>
-          </header>
+          {/* Top Header with Add Element Button - Only visible to admin */}
+          {isAdmin && (
+            <header className="sticky top-0 z-40">
+              <div className="flex items-center justify-end px-4 py-3">
+                <Button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar Elemento
+                </Button>
+              </div>
+            </header>
+          )}
 
           {/* Main Content Area */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto">
