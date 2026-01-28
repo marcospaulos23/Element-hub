@@ -11,10 +11,10 @@ const Home = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px),
-            linear-gradient(90deg, hsl(var(--foreground) / 0.08) 1px, transparent 1px)
+            linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
           `,
-          backgroundSize: "56px 56px",
+          backgroundSize: '60px 60px',
         }}
       />
       
