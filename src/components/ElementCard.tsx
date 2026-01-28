@@ -47,9 +47,10 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   );
   const hasPreviewImage = usePreviewImageEnabled && isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
   
-  // Check if this element needs full container scaling (Kamui or Fundo 3D)
+  // Check if this element needs full container scaling (Kamui, Fundo 3D, Flow Background)
   const needsFullScale = element.name.toLowerCase().includes("kamui") || 
-                         element.name.toLowerCase().includes("fundo 3d");
+                         element.name.toLowerCase().includes("fundo 3d") ||
+                         element.name.toLowerCase().includes("flow");
   
   // Use light background from element property
   const hasLightBackground = element.light_background === true;
