@@ -217,8 +217,8 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
           ref={btnRef}
           onClick={triggerKamui}
           className={`
-            px-10 py-[18px] bg-foreground text-background border-none rounded-[14px]
-            font-extrabold text-base cursor-pointer flex items-center gap-3
+            px-7 py-3 bg-foreground text-background border-none rounded-xl
+            font-semibold text-sm cursor-pointer flex items-center gap-2
             uppercase tracking-wide transition-all duration-400
             hover:-translate-y-1 hover:scale-[1.02]
             active:-translate-y-[1px] active:scale-[0.98]
@@ -230,7 +230,7 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
         >
           <span>Explorar Repositório</span>
           <svg
-            className="w-[22px] h-[22px] stroke-[3] transition-transform duration-400 group-hover:translate-x-2"
+            className="w-5 h-5 stroke-[2.5] transition-transform duration-400 group-hover:translate-x-2"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

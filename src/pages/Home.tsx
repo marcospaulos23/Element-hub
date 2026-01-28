@@ -10,7 +10,7 @@ const Home = () => {
         <div 
           className={`max-w-xl text-center transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
         >
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6">
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6">
             Element Hub
           </h1>
 
