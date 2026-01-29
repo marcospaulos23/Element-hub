@@ -10,7 +10,7 @@ import { Pencil, Image, X, Sun, ImageOff } from "lucide-react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 import ImageDropZone from "./ImageDropZone";
-import { cleanHtmlCode } from "@/lib/cleanHtmlCode";
+
 
 interface EditElementModalProps {
   isOpen: boolean;
@@ -176,19 +176,10 @@ const EditElementModal = ({ isOpen, onClose, onSave, element, categories }: Edit
                   id="edit-code"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                    const pastedText = e.clipboardData.getData('text');
-                    const cleanedCode = cleanHtmlCode(pastedText);
-                    setCode(cleanedCode);
-                  }}
                   placeholder="<button>Clique aqui</button>"
                   className="bg-secondary border-border focus:border-primary font-mono text-sm min-h-[140px]"
                   required
                 />
-                <p className="text-xs text-muted-foreground">
-                  💡 Cole código completo (com DOCTYPE/html/body) — será limpo automaticamente
-                </p>
               </div>
             </div>
 
