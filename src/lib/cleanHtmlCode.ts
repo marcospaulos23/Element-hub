@@ -32,7 +32,6 @@ export function cleanHtmlCode(code: string): string {
     // Also extract any <style> tags from the head to preserve custom CSS
     const headMatch = trimmedCode.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
     let styleTags = '';
-    let externalScripts = '';
     
     if (headMatch && headMatch[1]) {
       const styleMatches = headMatch[1].match(/<style[^>]*>[\s\S]*?<\/style>/gi);
@@ -45,27 +44,12 @@ export function cleanHtmlCode(code: string): string {
       if (fontLinks) {
         styleTags = fontLinks.join('\n') + '\n' + styleTags;
       }
-      
-      // Extract external script tags (CDN libraries like GSAP, but exclude Tailwind since it's already included)
-      const scriptMatches = headMatch[1].match(/<script[^>]*src=["'][^"']+["'][^>]*><\/script>/gi);
-      if (scriptMatches) {
-        // Filter out Tailwind CDN since CodePreview already includes it
-        const filteredScripts = scriptMatches.filter(script => !script.includes('tailwindcss.com'));
-        externalScripts = filteredScripts.join('\n');
-      }
     }
     
-    // Combine external scripts, styles with body content
-    let result = '';
-    if (externalScripts) {
-      result += externalScripts + '\n';
-    }
+    // Combine styles with body content
     if (styleTags) {
-      result += styleTags + '\n';
-    }
-    if (result) {
-      result += bodyContent;
-      console.log('[cleanHtmlCode] Result with scripts/styles, length:', result.length);
+      const result = styleTags + '\n' + bodyContent;
+      console.log('[cleanHtmlCode] Result with styles, length:', result.length);
       return result;
     }
     
