@@ -30,22 +30,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
     !cat.toLowerCase().includes("animac")
   );
   
-  // Check if element has BOTH "Animação/Animações" and "Botão/Botões" categories - these don't show preview image in grid
-  const hasBotao = allCategories.some(cat => cat.toLowerCase().includes("botõ") || cat.toLowerCase().includes("botão") || cat.toLowerCase().includes("botao") || cat.toLowerCase().includes("boto"));
-  const isAnimacaoAndBotao = isAnimated && hasBotao;
-  
-  // Check if use_preview_image is enabled (defaults to true if not set)
-  const usePreviewImageEnabled = element.use_preview_image !== false;
-  
-  // Show preview image for animation/loading categories, EXCEPT when both Animação and Botão are selected
-  // AND only if use_preview_image is enabled
-  const isAnimationOrLoading = allCategories.some(cat => 
-    cat.toLowerCase().includes("animaç") || 
-    cat.toLowerCase().includes("carregamento") ||
-    cat.toLowerCase().includes("loaders") ||
-    cat.toLowerCase().includes("loading")
-  );
-  const hasPreviewImage = usePreviewImageEnabled && isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
+  // Always show live preview - no static image fallback
   
   // Check if this element needs full container scaling (Kamui, Fundo 3D, Flow Background)
   const needsFullScale = element.name.toLowerCase().includes("kamui") || 
@@ -85,19 +70,9 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
         
         {/* Only render CodePreview when visible in viewport */}
         {isVisible && (
-          <>
-            {/* Always render CodePreview but hide it when showing preview image */}
-            <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
-              <CodePreview code={element.code} className="w-full h-full" fillContainer={needsFullScale} lightBackground={hasLightBackground} />
-            </div>
-            {hasPreviewImage && (
-              <img
-                src={element.preview_image!}
-                alt={element.name}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? "opacity-0 pointer-events-none" : "opacity-100"}`}
-              />
-            )}
-          </>
+          <div className="absolute inset-0">
+            <CodePreview code={element.code} className="w-full h-full" fillContainer={needsFullScale} lightBackground={hasLightBackground} />
+          </div>
         )}
         
         {!hasLightBackground && (
