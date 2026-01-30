@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
@@ -127,57 +127,57 @@ const Index = () => {
     return categoriesData.filter(cat => cat.is_visible && cat.name === activeCategory && elementsByCategory[cat.name]?.length > 0);
   }, [activeCategory, categoriesData, elementsByCategory]);
 
-  const handleElementClick = (element: UIElement) => {
+  const handleElementClick = useCallback((element: UIElement) => {
     setSelectedElement(element);
     setIsCodeModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseCodeModal = () => {
+  const handleCloseCodeModal = useCallback(() => {
     setIsCodeModalOpen(false);
     setTimeout(() => setSelectedElement(null), 200);
-  };
+  }, []);
 
-  const handleAddElement = async (newElement: Omit<UIElement, "id">) => {
+  const handleAddElement = useCallback(async (newElement: Omit<UIElement, "id">) => {
     await addElement(newElement);
-  };
+  }, [addElement]);
 
-  const handleAddCategory = async (categoryName: string, description?: string) => {
+  const handleAddCategory = useCallback(async (categoryName: string, description?: string) => {
     await addCategory(categoryName, description);
-  };
+  }, [addCategory]);
 
-  const handleDeleteElement = async (id: string) => {
+  const handleDeleteElement = useCallback(async (id: string) => {
     await deleteElement(id);
-  };
+  }, [deleteElement]);
 
-  const handleEditElement = (element: UIElement) => {
+  const handleEditElement = useCallback((element: UIElement) => {
     setElementToEdit(element);
     setIsEditModalOpen(true);
-  };
+  }, []);
 
-  const handleSaveEdit = async (id: string, updates: Partial<Omit<UIElement, "id">>) => {
+  const handleSaveEdit = useCallback(async (id: string, updates: Partial<Omit<UIElement, "id">>) => {
     await updateElement(id, updates);
     setIsEditModalOpen(false);
     setElementToEdit(null);
-  };
+  }, [updateElement]);
 
-  const handleEditCategory = (category: Category) => {
+  const handleEditCategory = useCallback((category: Category) => {
     setCategoryToEdit(category);
     setIsEditCategoryModalOpen(true);
-  };
+  }, []);
 
-  const handleSaveCategoryEdit = async (id: string, name: string, description?: string) => {
+  const handleSaveCategoryEdit = useCallback(async (id: string, name: string, description?: string) => {
     await updateCategory(id, name, description);
     setIsEditCategoryModalOpen(false);
     setCategoryToEdit(null);
-  };
+  }, [updateCategory]);
 
-  const handleDeleteCategory = async (id: string) => {
+  const handleDeleteCategory = useCallback(async (id: string) => {
     await deleteCategory(id);
-  };
+  }, [deleteCategory]);
 
-  const handleReorderCategories = async (fromIndex: number, toIndex: number) => {
+  const handleReorderCategories = useCallback(async (fromIndex: number, toIndex: number) => {
     await reorderCategories(fromIndex, toIndex);
-  };
+  }, [reorderCategories]);
 
   // Show loading while checking auth
   if (authLoading || (user && !profile)) {

@@ -90,7 +90,7 @@ const CodePreview = ({ code, className = "", fillContainer = false, lightBackgro
               let maxW = 0, maxH = 0;
               const start = performance.now();
               
-              while (performance.now() - start < 1500) {
+              while (performance.now() - start < 500) {
                 const b = content.getBoundingClientRect();
                 maxW = Math.max(maxW, b.width);
                 maxH = Math.max(maxH, b.height);
