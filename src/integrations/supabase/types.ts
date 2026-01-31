@@ -51,8 +51,10 @@ export type Database = {
           light_background: boolean
           name: string
           preview_image: string | null
+          preview_video: string | null
           updated_at: string
           use_preview_image: boolean
+          use_preview_video: boolean | null
         }
         Insert: {
           category: string[]
@@ -63,8 +65,10 @@ export type Database = {
           light_background?: boolean
           name: string
           preview_image?: string | null
+          preview_video?: string | null
           updated_at?: string
           use_preview_image?: boolean
+          use_preview_video?: boolean | null
         }
         Update: {
           category?: string[]
@@ -75,8 +79,10 @@ export type Database = {
           light_background?: boolean
           name?: string
           preview_image?: string | null
+          preview_video?: string | null
           updated_at?: string
           use_preview_image?: boolean
+          use_preview_video?: boolean | null
         }
         Relationships: []
       }

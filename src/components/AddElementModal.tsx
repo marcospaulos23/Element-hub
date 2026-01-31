@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Image, X, Sun, ImageOff } from "lucide-react";
+import { Plus, Image, X, Sun, ImageOff, Video } from "lucide-react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 import ImageDropZone from "./ImageDropZone";
@@ -27,6 +27,8 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
   const [previewImage, setPreviewImage] = useState("");
   const [lightBackground, setLightBackground] = useState(false);
   const [usePreviewImage, setUsePreviewImage] = useState(true);
+  const [previewVideo, setPreviewVideo] = useState("");
+  const [usePreviewVideo, setUsePreviewVideo] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +45,8 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
       preview_image: previewImage || null,
       light_background: lightBackground,
       use_preview_image: usePreviewImage,
+      preview_video: previewVideo || null,
+      use_preview_video: usePreviewVideo,
     });
 
     // Reset form
@@ -53,6 +57,8 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
     setPreviewImage("");
     setLightBackground(false);
     setUsePreviewImage(true);
+    setPreviewVideo("");
+    setUsePreviewVideo(false);
     onClose();
   };
 
@@ -219,6 +225,43 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
                   checked={usePreviewImage}
                   onCheckedChange={setUsePreviewImage}
                 />
+              </div>
+
+              {/* Video Preview Section */}
+              <div className="space-y-2 p-3 bg-secondary/50 rounded-lg border border-border">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Video className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground">Usar vídeo no card</span>
+                  </div>
+                  <Switch
+                    checked={usePreviewVideo}
+                    onCheckedChange={setUsePreviewVideo}
+                  />
+                </div>
+                {usePreviewVideo && (
+                  <div className="space-y-2 mt-3">
+                    <Input
+                      value={previewVideo}
+                      onChange={(e) => setPreviewVideo(e.target.value)}
+                      placeholder="URL do vídeo (MP4, WebM...)"
+                      className="bg-secondary border-border focus:border-primary text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      O vídeo aparecerá na frente do card, substituindo o preview do código
+                    </p>
+                    {previewVideo && (
+                      <video 
+                        src={previewVideo} 
+                        className="w-full aspect-video rounded-lg object-cover"
+                        muted 
+                        loop 
+                        autoPlay
+                        playsInline
+                      />
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Image Upload Section */}

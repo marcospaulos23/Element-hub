@@ -11,6 +11,8 @@ export interface UIElement {
   preview_image?: string | null;
   light_background?: boolean;
   use_preview_image?: boolean;
+  preview_video?: string | null;
+  use_preview_video?: boolean;
 }
 
 export const useElements = () => {

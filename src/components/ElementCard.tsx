@@ -1,7 +1,7 @@
 import { useState, memo } from "react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Play } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 interface ElementCardProps {
@@ -47,6 +47,9 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   );
   const hasPreviewImage = usePreviewImageEnabled && isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
   
+  // Check if video preview is enabled
+  const hasPreviewVideo = element.use_preview_video === true && element.preview_video && element.preview_video.trim() !== "";
+  
   // Check if this element needs full container scaling (Kamui, Fundo 3D, Flow Background)
   const needsFullScale = element.name.toLowerCase().includes("kamui") || 
                          element.name.toLowerCase().includes("fundo 3d") ||
@@ -74,7 +77,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
         }}
       />
 
-      {/* Code Preview / Image */}
+      {/* Code Preview / Image / Video */}
       <div className={`relative aspect-[16/10] overflow-hidden ${previewContainerBg}`}>
         {/* Skeleton placeholder while not visible */}
         {!isVisible && (
@@ -83,25 +86,49 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
           </div>
         )}
         
-        {/* Only render CodePreview when visible in viewport */}
+        {/* Only render content when visible in viewport */}
         {isVisible && (
           <>
-            {/* Always render CodePreview but hide it when showing preview image */}
-            <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
-              <CodePreview code={element.code} className="w-full h-full" fillContainer={needsFullScale} lightBackground={hasLightBackground} />
-            </div>
-            {hasPreviewImage && (
-              <img
-                src={element.preview_image!}
-                alt={element.name}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+            {/* Video preview takes priority when enabled */}
+            {hasPreviewVideo ? (
+              <video
+                src={element.preview_video!}
+                className="absolute inset-0 w-full h-full object-cover"
+                muted
+                loop
+                autoPlay
+                playsInline
               />
+            ) : (
+              <>
+                {/* CodePreview - hidden when showing preview image */}
+                <div className={hasPreviewImage && !isHovered ? "opacity-0 absolute inset-0" : "absolute inset-0"}>
+                  <CodePreview code={element.code} className="w-full h-full" fillContainer={needsFullScale} lightBackground={hasLightBackground} />
+                </div>
+                {hasPreviewImage && (
+                  <img
+                    src={element.preview_image!}
+                    alt={element.name}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                  />
+                )}
+              </>
             )}
           </>
         )}
         
-        {!hasLightBackground && (
+        {!hasLightBackground && !hasPreviewVideo && (
           <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
+        )}
+        
+        {/* Video badge indicator */}
+        {hasPreviewVideo && (
+          <div className="absolute top-2 left-2 z-20">
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-500/90 text-white text-xs font-medium backdrop-blur-sm">
+              <Play className="w-3 h-3" />
+              Vídeo
+            </span>
+          </div>
         )}
         
         {/* Animated badge indicator */}
