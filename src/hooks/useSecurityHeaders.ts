@@ -6,14 +6,8 @@ import { useEffect } from "react";
  */
 export const useSecurityHeaders = () => {
   useEffect(() => {
-    // Prevent clickjacking by checking if we're in an iframe
-    if (window.self !== window.top) {
-      // We're in an iframe - could be clickjacking attempt
-      console.warn('[Security] Application loaded in iframe - potential clickjacking');
-      
-      // Optionally break out of iframe (aggressive)
-      // window.top.location = window.self.location;
-    }
+    // Note: Iframe detection disabled for Lovable preview compatibility
+    // In production with your own domain, you can re-enable this
 
     // Disable drag and drop to prevent file-based attacks
     const preventDragDrop = (e: DragEvent) => {
