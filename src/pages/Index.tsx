@@ -4,7 +4,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
 import Hero from "@/components/Hero";
 import ElementCard from "@/components/ElementCard";
-import CategoryFilter from "@/components/CategoryFilter";
 import CodeModal from "@/components/CodeModal";
 import AddElementModal from "@/components/AddElementModal";
 import AddCategoryModal from "@/components/AddCategoryModal";
@@ -12,11 +11,11 @@ import EditElementModal from "@/components/EditElementModal";
 import EditCategoryModal from "@/components/EditCategoryModal";
 import ManageElementsSheet from "@/components/ManageElementsSheet";
 import ManageCategoriesSheet from "@/components/ManageCategoriesSheet";
+import RepositoryHeader from "@/components/RepositoryHeader";
 import { useElements, UIElement } from "@/hooks/useElements";
 import { useCategories, Category } from "@/hooks/useCategories";
 import { useAuth } from "@/hooks/useAuth";
-import { Plus, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -194,30 +193,24 @@ const Index = () => {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
-        {/* Sidebar */}
+        {/* Sidebar with categories */}
         <AppSidebar 
-          onAddCategory={() => setIsAddCategoryModalOpen(true)} 
-          onManageCategories={() => setIsManageCategoriesSheetOpen(true)}
-          onManageElements={() => setIsManageSheetOpen(true)}
           userEmail={user?.email}
+          categories={categoriesData}
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
         />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Top Header with Add Element Button - Only visible to admin */}
-          {isAdmin && (
-            <header className="sticky top-0 z-40">
-              <div className="flex items-center justify-end px-4 py-3">
-                <Button
-                  onClick={() => setIsAddModalOpen(true)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar Elemento
-                </Button>
-              </div>
-            </header>
-          )}
+          {/* Top Header with buttons */}
+          <RepositoryHeader
+            isAdmin={isAdmin}
+            onAddElement={() => setIsAddModalOpen(true)}
+            onAddCategory={() => setIsAddCategoryModalOpen(true)}
+            onManageCategories={() => setIsManageCategoriesSheetOpen(true)}
+            onManageElements={() => setIsManageSheetOpen(true)}
+          />
 
           {/* Main Content Area */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto">
@@ -226,15 +219,6 @@ const Index = () => {
             {/* Elements Section */}
             <section id="elements" className="pt-20 pb-12 px-4 md:px-8">
               <div className="max-w-7xl mx-auto">
-                {/* Category Filter */}
-                <div className="mb-16">
-                  <CategoryFilter
-                    categories={categoryNames}
-                    activeCategory={activeCategory}
-                    onCategoryChange={setActiveCategory}
-                  />
-                </div>
-
                 {/* Loading State */}
                 {loading && (
                   <div className="flex items-center justify-center py-20">
