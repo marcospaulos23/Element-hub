@@ -1,4 +1,4 @@
-import { Home, BookOpen, Settings, PanelLeft, Sparkles, FolderPlus, LayoutGrid, FolderEdit } from "lucide-react";
+import { Home, BookOpen, Settings, PanelLeft, Sparkles, Code2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -14,21 +14,30 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Category } from "@/hooks/useCategories";
+import { cn } from "@/lib/utils";
 
-// Email do administrador - apenas este email verá as opções de gerenciamento
-const ADMIN_EMAIL = "marcoscorporation23@gmail.com";
+// Category icons mapping
+const getCategoryIcon = (categoryName: string) => {
+  // Default icon for categories
+  return Code2;
+};
 
 interface AppSidebarProps {
-  onAddCategory: () => void;
-  onManageCategories: () => void;
-  onManageElements: () => void;
   userEmail?: string | null;
+  categories?: Category[];
+  activeCategory?: string;
+  onCategoryChange?: (category: string) => void;
 }
 
-const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements, userEmail }: AppSidebarProps) => {
+const AppSidebar = ({ 
+  userEmail, 
+  categories = [], 
+  activeCategory = "Todos",
+  onCategoryChange 
+}: AppSidebarProps) => {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const isAdmin = userEmail === ADMIN_EMAIL;
 
   const mainNavItems = [
     { title: "Início", icon: Home, href: "/", isRoute: true },
@@ -40,12 +49,15 @@ const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements, userE
     { title: "Configurações", icon: Settings, href: "/settings", isRoute: true },
   ];
 
+  // Filter to only visible categories
+  const visibleCategories = categories.filter(c => c.is_visible);
+
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarHeader className="p-3">
         {/* Collapse Button - Top */}
         <div className="flex items-center justify-between">
-        {!isCollapsed && (
+          {!isCollapsed && (
             <span className="font-semibold text-foreground text-lg tracking-wider" style={{ fontFamily: "'Orbitron', sans-serif" }}>
               Element Hub
             </span>
@@ -61,42 +73,55 @@ const AppSidebar = ({ onAddCategory, onManageCategories, onManageElements, userE
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Action Buttons - Only visible to admin */}
-        {isAdmin && (
+        {/* Categories Section */}
+        {visibleCategories.length > 0 && (
           <>
             <SidebarGroup>
+              <SidebarGroupLabel className="text-muted-foreground uppercase text-[10px] tracking-wider">
+                Menu de Acesso Rápido
+              </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
+                  {/* "Todos" option */}
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      onClick={onAddCategory}
-                      tooltip="Adicionar Categoria"
-                      className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
+                      onClick={() => onCategoryChange?.("Todos")}
+                      tooltip="Todos os Códigos"
+                      className={cn(
+                        "relative transition-all duration-200",
+                        activeCategory === "Todos" 
+                          ? "bg-primary/15 text-primary border-l-2 border-primary" 
+                          : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                      )}
                     >
-                      <FolderPlus className="h-4 w-4" />
-                      {!isCollapsed && <span>Adicionar Categoria</span>}
+                      <Code2 className="h-4 w-4" />
+                      {!isCollapsed && <span>Todos os Códigos</span>}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={onManageCategories}
-                      tooltip="Editar Categorias"
-                      className="bg-secondary hover:bg-secondary/80 text-foreground border border-border"
-                    >
-                      <FolderEdit className="h-4 w-4" />
-                      {!isCollapsed && <span>Editar Categorias</span>}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={onManageElements}
-                      tooltip="Gerenciar Elementos"
-                      className="bg-secondary hover:bg-secondary/80 text-foreground border border-border"
-                    >
-                      <LayoutGrid className="h-4 w-4" />
-                      {!isCollapsed && <span>Gerenciar Elementos</span>}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+
+                  {/* Category items */}
+                  {visibleCategories.map((category) => {
+                    const IconComponent = getCategoryIcon(category.name);
+                    const isActive = activeCategory === category.name;
+                    
+                    return (
+                      <SidebarMenuItem key={category.id}>
+                        <SidebarMenuButton
+                          onClick={() => onCategoryChange?.(category.name)}
+                          tooltip={category.name}
+                          className={cn(
+                            "relative transition-all duration-200",
+                            isActive 
+                              ? "bg-primary/15 text-primary border-l-2 border-primary" 
+                              : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          <IconComponent className="h-4 w-4" />
+                          {!isCollapsed && <span className="truncate">{category.name}</span>}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
