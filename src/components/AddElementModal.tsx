@@ -10,6 +10,7 @@ import { Plus, Image, X, Sun, ImageOff, Video } from "lucide-react";
 import { UIElement } from "@/hooks/useElements";
 import CodePreview from "./CodePreview";
 import ImageDropZone from "./ImageDropZone";
+import VideoDropZone from "./VideoDropZone";
 import { cleanHtmlCode } from "@/lib/cleanHtmlCode";
 
 interface AddElementModalProps {
@@ -32,7 +33,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name || !description || selectedCategories.length === 0 || !code) {
       return;
     }
@@ -78,7 +79,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl bg-popover border-border max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-button]:bg-zinc-500 [&::-webkit-scrollbar-button]:h-3 [&::-webkit-scrollbar-button:vertical:decrement]:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2352525b%22><path d=%22M12 8l-6 6h12z%22/></svg>')] [&::-webkit-scrollbar-button:vertical:decrement]:bg-center [&::-webkit-scrollbar-button:vertical:decrement]:bg-no-repeat [&::-webkit-scrollbar-button:vertical:increment]:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2352525b%22><path d=%22M12 16l-6-6h12z%22/></svg>')] [&::-webkit-scrollbar-button:vertical:increment]:bg-center [&::-webkit-scrollbar-button:vertical:increment]:bg-no-repeat">
+      <DialogContent className="max-w-4xl bg-popover border-border max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-zinc-300 [&::-webkit-scrollbar-thumb]:bg-zinc-600 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-button]:bg-zinc-300 [&::-webkit-scrollbar-button]:h-3 [&::-webkit-scrollbar-button:vertical:decrement]:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2352525b%22><path d=%22M12 8l-6 6h12z%22/></svg>')] [&::-webkit-scrollbar-button:vertical:decrement]:bg-center [&::-webkit-scrollbar-button:vertical:decrement]:bg-no-repeat [&::-webkit-scrollbar-button:vertical:increment]:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2352525b%22><path d=%22M12 16l-6-6h12z%22/></svg>')] [&::-webkit-scrollbar-button:vertical:increment]:bg-center [&::-webkit-scrollbar-button:vertical:increment]:bg-no-repeat">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary" />
@@ -122,7 +123,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
               {/* Categories - Multiple Selection */}
               <div className="space-y-3">
                 <Label className="text-foreground">Categorias / Tags</Label>
-                
+
                 {/* Selected Categories Tags */}
                 {selectedCategories.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
@@ -204,8 +205,8 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
                   </div>
                 </div>
                 <div className="overflow-hidden rounded-lg border border-border">
-                  <CodePreview 
-                    code={code} 
+                  <CodePreview
+                    code={code}
                     className="aspect-video min-h-[200px] max-h-[220px]"
                     lightBackground={lightBackground}
                   />
@@ -232,7 +233,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Video className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-foreground">Usar vídeo no card</span>
+                    <span className="text-sm text-foreground">Usar vídeo/GIF no card</span>
                   </div>
                   <Switch
                     checked={usePreviewVideo}
@@ -241,25 +242,24 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
                 </div>
                 {usePreviewVideo && (
                   <div className="space-y-2 mt-3">
-                    <Input
+                    <VideoDropZone
                       value={previewVideo}
-                      onChange={(e) => setPreviewVideo(e.target.value)}
-                      placeholder="URL do vídeo (MP4, WebM...)"
-                      className="bg-secondary border-border focus:border-primary text-sm"
+                      onChange={setPreviewVideo}
+                      className="aspect-video min-h-[140px]"
                     />
                     <p className="text-xs text-muted-foreground">
-                      O vídeo aparecerá na frente do card, substituindo o preview do código
+                      O vídeo/GIF aparecerá na frente do card, substituindo o preview do código
                     </p>
-                    {previewVideo && (
-                      <video 
-                        src={previewVideo} 
-                        className="w-full aspect-video rounded-lg object-cover"
-                        muted 
-                        loop 
-                        autoPlay
-                        playsInline
+
+                    {/* URL fallback input */}
+                    <div className="space-y-1">
+                      <Input
+                        value={previewVideo}
+                        onChange={(e) => setPreviewVideo(e.target.value)}
+                        placeholder="Ou cole a URL do vídeo/GIF"
+                        className="bg-secondary border-border focus:border-primary text-sm"
                       />
-                    )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -275,7 +275,7 @@ const AddElementModal = ({ isOpen, onClose, onAdd, categories }: AddElementModal
                   onChange={setPreviewImage}
                   className="aspect-video min-h-[140px]"
                 />
-                
+
                 {/* URL fallback input */}
                 <div className="space-y-1">
                   <Input

@@ -17,44 +17,44 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
   });
 
   const allCategories = Array.isArray(element.category) ? element.category : [element.category];
-  
+
   // Check if element has animation category (to show as characteristic badge)
-  const isAnimated = allCategories.some(cat => 
-    cat.toLowerCase().includes("animaç") || 
+  const isAnimated = allCategories.some(cat =>
+    cat.toLowerCase().includes("animaç") ||
     cat.toLowerCase().includes("animac")
   );
-  
+
   // Filter out animation categories from display - they'll show as a badge instead
-  const categories = allCategories.filter(cat => 
-    !cat.toLowerCase().includes("animaç") && 
+  const categories = allCategories.filter(cat =>
+    !cat.toLowerCase().includes("animaç") &&
     !cat.toLowerCase().includes("animac")
   );
-  
+
   // Check if element has BOTH "Animação/Animações" and "Botão/Botões" categories - these don't show preview image in grid
   const hasBotao = allCategories.some(cat => cat.toLowerCase().includes("botõ") || cat.toLowerCase().includes("botão") || cat.toLowerCase().includes("botao") || cat.toLowerCase().includes("boto"));
   const isAnimacaoAndBotao = isAnimated && hasBotao;
-  
+
   // Check if use_preview_image is enabled (defaults to true if not set)
   const usePreviewImageEnabled = element.use_preview_image !== false;
-  
+
   // Show preview image for animation/loading categories, EXCEPT when both Animação and Botão are selected
   // AND only if use_preview_image is enabled
-  const isAnimationOrLoading = allCategories.some(cat => 
-    cat.toLowerCase().includes("animaç") || 
+  const isAnimationOrLoading = allCategories.some(cat =>
+    cat.toLowerCase().includes("animaç") ||
     cat.toLowerCase().includes("carregamento") ||
     cat.toLowerCase().includes("loaders") ||
     cat.toLowerCase().includes("loading")
   );
   const hasPreviewImage = usePreviewImageEnabled && isAnimationOrLoading && !isAnimacaoAndBotao && element.preview_image && element.preview_image.trim() !== "";
-  
+
   // Check if video preview is enabled
   const hasPreviewVideo = element.use_preview_video === true && element.preview_video && element.preview_video.trim() !== "";
-  
+
   // Check if this element needs full container scaling (Kamui, Fundo 3D, Flow Background)
-  const needsFullScale = element.name.toLowerCase().includes("kamui") || 
-                         element.name.toLowerCase().includes("fundo 3d") ||
-                         element.name.toLowerCase().includes("flow");
-  
+  const needsFullScale = element.name.toLowerCase().includes("kamui") ||
+    element.name.toLowerCase().includes("fundo 3d") ||
+    element.name.toLowerCase().includes("flow");
+
   // Use light background from element property
   const hasLightBackground = element.light_background === true;
 
@@ -70,7 +70,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       style={{ animationDelay: `${parseInt(element.id) * 100}ms` }}
     >
       {/* Gradient glow effect on hover */}
-      <div 
+      <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl z-10"
         style={{
           background: 'radial-gradient(ellipse at 50% 0%, hsl(0 0% 100% / 0.08) 0%, transparent 60%)'
@@ -85,7 +85,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
             <div className="w-8 h-8 rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground/60 animate-spin" />
           </div>
         )}
-        
+
         {/* Only render content when visible in viewport */}
         {isVisible && (
           <>
@@ -116,11 +116,11 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
             )}
           </>
         )}
-        
+
         {!hasLightBackground && !hasPreviewVideo && (
           <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-40 pointer-events-none" />
         )}
-        
+
         {/* Video badge indicator */}
         {hasPreviewVideo && (
           <div className="absolute top-2 left-2 z-20">
@@ -130,7 +130,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
             </span>
           </div>
         )}
-        
+
         {/* Animated badge indicator */}
         {isAnimated && (
           <div className="absolute top-2 right-2 z-20">
@@ -146,7 +146,7 @@ const ElementCard = ({ element, onClick }: ElementCardProps) => {
       <div className="p-4">
         <div className="flex flex-wrap items-center gap-1.5 mb-3">
           {categories.map((cat, index) => (
-            <span 
+            <span
               key={index}
               className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground border border-border font-['Space_Grotesk']"
             >

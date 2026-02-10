@@ -34,7 +34,7 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
         .select("is_approved")
         .eq("user_id", userId)
         .maybeSingle();
-      
+
       setIsApproved(profile?.is_approved ?? false);
     };
 
@@ -141,11 +141,9 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
       return;
     }
 
-    // If authenticated but not approved, redirect to pending page
-    if (!isApproved) {
-      navigate("/access-pending");
-      return;
-    }
+    // If authenticated, we let them proceed to the repository
+    // The repository page (Index.tsx) handles the specific approval/admin checks
+    // This avoids race conditions or duplicate logic here
 
     const state = stateRef.current;
     const canvas = canvasRef.current;
@@ -197,60 +195,60 @@ const KamuiButton = ({ children, onAnimationStart }: KamuiButtonProps) => {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-      const animate = () => {
+    const animate = () => {
       const state = stateRef.current;
       const width = canvas.width;
       const height = canvas.height;
 
-        // When idle and not waiting for navigation, keep canvas transparent
-        if (!state.isActivated && !state.isWaiting) {
-          ctx.clearRect(0, 0, width, height);
-          canvas.style.transform = "";
-          animationRef.current = requestAnimationFrame(animate);
-          return;
-        }
-        
-        // When waiting for navigation, keep screen black
-        if (state.isWaiting) {
-          ctx.fillStyle = "rgba(0, 0, 0, 1)";
-          ctx.fillRect(0, 0, width, height);
-          animationRef.current = requestAnimationFrame(animate);
-          return;
-        }
+      // When idle and not waiting for navigation, keep canvas transparent
+      if (!state.isActivated && !state.isWaiting) {
+        ctx.clearRect(0, 0, width, height);
+        canvas.style.transform = "";
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
 
-        const trailOpacity = state.isEnding ? 0.4 : 0.2;
-        ctx.fillStyle = `rgba(0, 0, 0, ${trailOpacity})`;
+      // When waiting for navigation, keep screen black
+      if (state.isWaiting) {
+        ctx.fillStyle = "rgba(0, 0, 0, 1)";
         ctx.fillRect(0, 0, width, height);
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
 
-        if (state.isEnding) {
-          state.zoomAcceleration *= 1.025;
-          state.zoomScale *= state.zoomAcceleration;
-          canvas.style.transform = `scale(${state.zoomScale})`;
-        }
+      const trailOpacity = state.isEnding ? 0.4 : 0.2;
+      ctx.fillStyle = `rgba(0, 0, 0, ${trailOpacity})`;
+      ctx.fillRect(0, 0, width, height);
 
-        for (let i = state.particles.length - 1; i >= 0; i--) {
-          const p = state.particles[i];
-          p.update(state.isEnding, state.zoomScale);
-          p.draw(ctx, state.zoomScale);
-          if (!p.active) state.particles.splice(i, 1);
-        }
+      if (state.isEnding) {
+        state.zoomAcceleration *= 1.025;
+        state.zoomScale *= state.zoomAcceleration;
+        canvas.style.transform = `scale(${state.zoomScale})`;
+      }
 
-        const rotationSpeed = 0.12 + (state.isEnding ? state.zoomScale * 0.15 : 0);
-        state.angle += rotationSpeed;
-        state.totalRotation += rotationSpeed;
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.update(state.isEnding, state.zoomScale);
+        p.draw(ctx, state.zoomScale);
+        if (!p.active) state.particles.splice(i, 1);
+      }
 
-        if (state.totalRotation >= Math.PI * 5 && !state.isEnding) {
-          state.isEnding = true;
-        }
+      const rotationSpeed = 0.12 + (state.isEnding ? state.zoomScale * 0.15 : 0);
+      state.angle += rotationSpeed;
+      state.totalRotation += rotationSpeed;
 
-        if (state.isEnding && (state.zoomScale > 80 || state.particles.length === 0)) {
-          state.isActivated = false;
-          state.isWaiting = true;
+      if (state.totalRotation >= Math.PI * 5 && !state.isEnding) {
+        state.isEnding = true;
+      }
 
-          setTimeout(() => {
-            navigate("/repository");
-          }, 400);
-        }
+      if (state.isEnding && (state.zoomScale > 80 || state.particles.length === 0)) {
+        state.isActivated = false;
+        state.isWaiting = true;
+
+        setTimeout(() => {
+          navigate("/repository");
+        }, 400);
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     };

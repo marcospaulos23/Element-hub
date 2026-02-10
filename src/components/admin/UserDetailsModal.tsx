@@ -75,14 +75,14 @@ const UserDetailsModal = ({ user, open, onOpenChange }: UserDetailsModalProps) =
             Informações do perfil do usuário
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-6 py-4">
           {/* Avatar and Name */}
           <div className="flex items-center gap-4">
             {user.avatar_url ? (
-              <img 
-                src={user.avatar_url} 
-                alt="" 
+              <img
+                src={user.avatar_url}
+                alt=""
                 className="w-16 h-16 rounded-full object-cover border-2 border-border"
               />
             ) : (
@@ -120,7 +120,7 @@ const UserDetailsModal = ({ user, open, onOpenChange }: UserDetailsModalProps) =
                 {loading ? (
                   <Skeleton className="h-5 w-48" />
                 ) : (
-                  <p className="font-medium">{authData?.email || "Não disponível"}</p>
+                  <p className="font-medium">{authData?.email || user?.email || "Não disponível"}</p>
                 )}
               </div>
             </div>

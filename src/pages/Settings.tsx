@@ -25,15 +25,12 @@ const ADMIN_EMAIL = "marcoscorporation23@gmail.com";
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { user, profile, loading, signOut, updateProfile, uploadAvatar } = useAuth();
+  const { user, profile, loading, signOut, updateProfile, uploadAvatar, isAdmin } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [displayName, setDisplayName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-
-  // Verifica se é admin pelo email
-  const isAdmin = user?.email === ADMIN_EMAIL;
 
   // Redirect if not logged in
   useEffect(() => {
@@ -107,8 +104,8 @@ const Settings = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link 
-            to="/repository" 
+          <Link
+            to="/repository"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -120,7 +117,7 @@ const Settings = () => {
       {/* Content */}
       <main className="max-w-2xl mx-auto px-4 py-12">
         <div className="mb-8">
-          <h1 
+          <h1
             className="text-3xl font-bold tracking-wider"
             style={{ fontFamily: "'Orbitron', sans-serif" }}
           >

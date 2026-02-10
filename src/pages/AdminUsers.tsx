@@ -6,11 +6,16 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, Shield, Bell } from "lucide-react";
+import { Loader2, ArrowLeft, Shield, Bell, Users, Boxes } from "lucide-react";
 import { Link } from "react-router-dom";
 import UserDetailsModal from "@/components/admin/UserDetailsModal";
 import PendingUserCard from "@/components/admin/PendingUserCard";
 import ApprovedUserCard from "@/components/admin/ApprovedUserCard";
+import AdminStatsChart from "@/components/admin/AdminStatsChart";
+import { DashboardFilter, FilterPeriod } from "@/components/admin/DashboardFilter";
+import { DateRange } from "react-day-picker";
+import { subDays, isWithinInterval, startOfDay, endOfDay } from "date-fns";
+import StatCard from "@/components/admin/StatCard";
 
 interface UserProfile {
   id: string;
@@ -22,9 +27,6 @@ interface UserProfile {
   email?: string;
 }
 
-// Email do administrador autorizado
-const ADMIN_EMAIL = "marcoscorporation23@gmail.com";
-
 const AdminUsers = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -34,9 +36,17 @@ const AdminUsers = () => {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [elementsCount, setElementsCount] = useState(0);
 
-  // Verifica se o usuário é admin pelo email
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  // Verifica se o usuário é admin pelo hook useAuth
+  const { isAdmin } = useAuth();
+
+  /* New state for filtering */
+  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>("today");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: startOfDay(new Date()),
+    to: endOfDay(new Date()),
+  });
 
   useEffect(() => {
     // Redireciona imediatamente se não for admin
@@ -45,11 +55,12 @@ const AdminUsers = () => {
         navigate("/auth");
         return;
       }
-      if (user.email !== ADMIN_EMAIL) {
+      if (!isAdmin) {
         navigate("/repository");
         return;
       }
       fetchUsers();
+      fetchElementsCount();
     }
   }, [user, authLoading, navigate]);
 
@@ -104,9 +115,21 @@ const AdminUsers = () => {
     setLoading(false);
   };
 
+  const fetchElementsCount = async () => {
+    const { count, error } = await supabase
+      .from("elements")
+      .select("*", { count: "exact", head: true });
+
+    if (error) {
+      console.error("Error fetching elements count:", error);
+    } else {
+      setElementsCount(count || 0);
+    }
+  };
+
   const handleApproval = async (userId: string, approve: boolean) => {
     setProcessingId(userId);
-    
+
     const { error } = await supabase
       .from("profiles")
       .update({ is_approved: approve })
@@ -121,20 +144,19 @@ const AdminUsers = () => {
     } else {
       toast({
         title: approve ? "Acesso liberado!" : "Acesso revogado",
-        description: approve 
-          ? "O usuário agora pode acessar o repositório." 
+        description: approve
+          ? "O usuário agora pode acessar o repositório."
           : "O acesso do usuário foi revogado.",
       });
       await fetchUsers();
     }
-    
+
     setProcessingId(null);
   };
 
   const handleReject = async (userId: string) => {
     setProcessingId(userId);
-    
-    // Deleta o perfil do usuário rejeitado
+
     const { error } = await supabase
       .from("profiles")
       .delete()
@@ -153,7 +175,7 @@ const AdminUsers = () => {
       });
       await fetchUsers();
     }
-    
+
     setProcessingId(null);
   };
 
@@ -198,35 +220,122 @@ const AdminUsers = () => {
     );
   }
 
-  const pendingUsers = users.filter(u => !u.is_approved);
-  const approvedUsers = users.filter(u => u.is_approved);
+  // Handle filter changes
+  const handlePeriodChange = (period: FilterPeriod) => {
+    setFilterPeriod(period);
+    const today = new Date();
+
+    if (period === "today") {
+      setDateRange({ from: startOfDay(today), to: endOfDay(today) });
+    } else if (period === "week") {
+      setDateRange({ from: subDays(today, 7), to: endOfDay(today) });
+    } else if (period === "month") {
+      setDateRange({ from: subDays(today, 30), to: endOfDay(today) });
+    } else if (period === "all") {
+      setDateRange(undefined);
+    } else {
+      // Custom: keep existing range or init empty
+      if (!dateRange) setDateRange({ from: today, to: today });
+    }
+  };
+
+  // Filter logic
+  const filteredUsers = users.filter(user => {
+    if (filterPeriod === "all") return true;
+    if (!dateRange?.from) return true;
+
+    const userDate = new Date(user.created_at);
+    // Ensure we compare inclusive of the day
+    const start = startOfDay(dateRange.from);
+    const end = dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from);
+
+    return isWithinInterval(userDate, { start, end });
+  });
+
+  // Prepare Chart Data
+  const chartData = filteredUsers.reduce((acc, user) => {
+    const date = new Date(user.created_at).toISOString().split('T')[0];
+    const existing = acc.find(item => item.date === date);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      acc.push({ date, count: 1 });
+    }
+    return acc;
+  }, [] as { date: string; count: number }[]).sort((a, b) => a.date.localeCompare(b.date));
+
+  const pendingUsers = filteredUsers.filter(u => !u.is_approved);
+  const approvedUsers = filteredUsers.filter(u => u.is_approved);
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        <Link 
-          to="/settings" 
+        <Link
+          to="/settings"
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Voltar às Configurações
         </Link>
 
-        <div className="mb-8 flex items-center justify-between">
+        {/* Header Section */}
+        <div className="mb-8 space-y-4 md:space-y-0 md:flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
             <p className="text-muted-foreground mt-1">
               Aprove ou revogue acesso dos usuários ao repositório
             </p>
           </div>
-          {pendingUsers.length > 0 && (
-            <div className="flex items-center gap-2 text-primary">
-              <Bell className="w-5 h-5 animate-pulse" />
-              <span className="text-sm font-medium">
-                {pendingUsers.length} pendente{pendingUsers.length > 1 ? 's' : ''}
-              </span>
+
+          <div className="flex flex-col items-end gap-2">
+            <DashboardFilter
+              period={filterPeriod}
+              dateRange={dateRange}
+              onPeriodChange={handlePeriodChange}
+              onDateRangeChange={setDateRange}
+            />
+
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="text-sm py-1">
+                Total: {users.length}
+              </Badge>
+              {filterPeriod !== "all" && (
+                <Badge variant="secondary" className="text-sm py-1">
+                  Neste período: {filteredUsers.length}
+                </Badge>
+              )}
             </div>
-          )}
+          </div>
+        </div>
+
+        {/* Dashboard Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <StatCard
+            title="Total de Logins"
+            value={users.length}
+            icon={Users}
+            iconColor="text-blue-600"
+            bgColor="bg-blue-50"
+          />
+          <StatCard
+            title="Total de Elementos"
+            value={elementsCount}
+            icon={Boxes}
+            iconColor="text-purple-600"
+            bgColor="bg-purple-50"
+          />
+          <StatCard
+            title="Usuários Aprovados"
+            value={approvedUsers.length}
+            icon={Shield}
+            iconColor="text-green-600"
+            bgColor="bg-green-50"
+          />
+        </div>
+
+        {/* Stats Chart */}
+        <div className="mb-6">
+          <AdminStatsChart data={chartData} />
         </div>
 
         {/* Pending Users */}
@@ -235,7 +344,7 @@ const AdminUsers = () => {
             <CardTitle className="flex items-center gap-2">
               Pendentes
               {pendingUsers.length > 0 && (
-                <Badge variant="secondary">{pendingUsers.length}</Badge>
+                <Badge variant="destructive">{pendingUsers.length}</Badge>
               )}
             </CardTitle>
             <CardDescription>
@@ -245,7 +354,7 @@ const AdminUsers = () => {
           <CardContent>
             {pendingUsers.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">
-                Nenhum usuário pendente
+                Nenhum usuário pendente neste período
               </p>
             ) : (
               <div className="space-y-3">
@@ -278,7 +387,7 @@ const AdminUsers = () => {
           <CardContent>
             {approvedUsers.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">
-                Nenhum usuário aprovado
+                Nenhum usuário aprovado neste período
               </p>
             ) : (
               <div className="space-y-3">
@@ -306,5 +415,4 @@ const AdminUsers = () => {
     </div>
   );
 };
-
 export default AdminUsers;

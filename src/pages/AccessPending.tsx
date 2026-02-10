@@ -1,11 +1,25 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Home } from "lucide-react";
+import { Clock, Home, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const AccessPending = () => {
+  const { signOut } = useAuth();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <div className="absolute top-6 right-6">
+        <Button
+          variant="ghost"
+          onClick={() => signOut()}
+          className="text-muted-foreground hover:text-foreground gap-2"
+        >
+          <LogOut className="w-4 h-4" />
+          Sair / Outra conta
+        </Button>
+      </div>
+
       <Card className="w-full max-w-md border-border text-center">
         <CardHeader>
           <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -13,7 +27,7 @@ const AccessPending = () => {
           </div>
           <CardTitle className="text-2xl">Solicitação Enviada!</CardTitle>
           <CardDescription className="text-base mt-2">
-            O pedido de acesso já foi solicitado. Quando seu login for liberado, 
+            O pedido de acesso já foi solicitado. Quando seu login for liberado,
             você poderá acessar tranquilamente com o e-mail e senha cadastrados.
           </CardDescription>
         </CardHeader>

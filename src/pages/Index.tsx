@@ -19,8 +19,8 @@ import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, profile, loading: authLoading } = useAuth();
-  
+  const { user, profile, isAdmin, loading: authLoading } = useAuth();
+
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [selectedElement, setSelectedElement] = useState<UIElement | null>(null);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
@@ -41,11 +41,25 @@ const Index = () => {
     if (!authLoading) {
       if (!user) {
         navigate("/auth", { state: { returnTo: "/repository" } });
-      } else if (profile && !profile.is_approved) {
+        return;
+      }
+
+      // EMERGENCY BYPASS for specific admin email
+      if (user.email === "marcospaulosites23@gmail.com" || user.email === "marcoscorporation23@gmail.com") {
+        return;
+      }
+
+      // Allow access if user is admin or explicitly approved
+      if (isAdmin || (profile && profile.is_approved)) {
+        return;
+      }
+
+      // Only redirect to pending if we have a profile and it is explicitly NOT approved
+      if (profile && !profile.is_approved) {
         navigate("/access-pending");
       }
     }
-  }, [user, profile, authLoading, navigate]);
+  }, [user, profile, isAdmin, authLoading, navigate]);
 
   // Map visible categories to string array with "Todos" as first item (for filter bar)
   const categoryNames = useMemo(() => {
@@ -65,19 +79,19 @@ const Index = () => {
   // Group elements by category, sorted by creation date (oldest first, newest last)
   const elementsByCategory = useMemo(() => {
     const grouped: Record<string, UIElement[]> = {};
-    
+
     // Initialize all categories (except "Todos")
     categoriesData.forEach(cat => {
       grouped[cat.name] = [];
     });
-    
+
     // Sort elements by created_at ascending (oldest first, newest last)
     const sortedElements = [...elements].sort((a, b) => {
       const dateA = new Date((a as any).created_at || 0).getTime();
       const dateB = new Date((b as any).created_at || 0).getTime();
       return dateA - dateB;
     });
-    
+
     // Distribute elements into their categories
     sortedElements.forEach(el => {
       const cats = Array.isArray(el.category) ? el.category : [el.category];
@@ -90,15 +104,15 @@ const Index = () => {
         }
       });
     });
-    
+
     // Apply pinned elements ordering per category
     Object.entries(pinnedElements).forEach(([categoryName, pinnedNames]) => {
       if (grouped[categoryName]) {
         const pinned: UIElement[] = [];
         const rest: UIElement[] = [];
-        
+
         grouped[categoryName].forEach(el => {
-          const pinnedIndex = pinnedNames.findIndex(name => 
+          const pinnedIndex = pinnedNames.findIndex(name =>
             el.name.toLowerCase().includes(name.toLowerCase())
           );
           if (pinnedIndex !== -1) {
@@ -107,12 +121,12 @@ const Index = () => {
             rest.push(el);
           }
         });
-        
+
         // Filter out undefined slots and combine with rest
         grouped[categoryName] = [...pinned.filter(Boolean), ...rest];
       }
     });
-    
+
     return grouped;
   }, [elements, categoriesData]);
 
@@ -178,27 +192,27 @@ const Index = () => {
     await reorderCategories(fromIndex, toIndex);
   }, [reorderCategories]);
 
-  // Show loading while checking auth
-  if (authLoading || (user && !profile)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  // Show loading while checking auth - removed to avoid loading animation
+  // if (authLoading || (user && !profile)) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-background">
+  //       <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  //     </div>
+  //   );
+  // }
 
-  // Email do administrador
-  const isAdmin = user?.email === "marcoscorporation23@gmail.com";
+  // isAdmin já vem do hook useAuth
 
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         {/* Sidebar with categories */}
-        <AppSidebar 
+        <AppSidebar
           userEmail={user?.email}
           categories={categoriesData}
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
+          isAdmin={isAdmin}
         />
 
         {/* Main Content */}
@@ -214,10 +228,11 @@ const Index = () => {
 
           {/* Main Content Area */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto">
-            <Hero />
+            {/* Hero - apenas para "Todos" */}
+            {activeCategory === "Todos" && <Hero />}
 
             {/* Elements Section */}
-            <section id="elements" className="pt-20 pb-12 px-4 md:px-8">
+            <section id="elements" className="pb-12 px-4 md:px-8">
               <div className="max-w-7xl mx-auto">
                 {/* Loading State */}
                 {loading && (
@@ -233,16 +248,29 @@ const Index = () => {
                       <div key={category.id}>
                         {/* Category Title and Description */}
                         <div className="mb-6 border-b border-border pb-3">
-                          <h2 className="text-2xl font-semibold text-foreground">
-                            {category.name}
-                          </h2>
-                          {category.description && (
-                            <p className="text-muted-foreground text-sm mt-1">
-                              {category.description}
-                            </p>
+                          {activeCategory === "Todos" ? (
+                            // Modo "Todos": mostra nome e descrição da categoria
+                            <div>
+                              <h2 className="text-2xl font-semibold text-foreground">
+                                {category.name}
+                              </h2>
+                              {category.description && (
+                                <p className="text-muted-foreground text-sm mt-1">
+                                  {category.description}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            // Outras categorias: mostra apenas o contador
+                            <div className="text-muted-foreground text-sm pt-8">
+                              <span className="font-semibold text-foreground text-lg">
+                                {elementsByCategory[category.name]?.length || 0}
+                              </span>{" "}
+                              {elementsByCategory[category.name]?.length === 1 ? "código encontrado" : "códigos encontrados"}
+                            </div>
                           )}
                         </div>
-                        
+
                         {/* Elements Grid for this Category */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                           {elementsByCategory[category.name]?.map((element) => (

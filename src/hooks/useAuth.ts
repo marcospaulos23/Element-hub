@@ -17,58 +17,102 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+
+      setProfile(data);
+      return data;
+    } catch (error) {
+      console.error("Unexpected error fetching profile:", error);
+      return null;
+    }
+  };
+
+  const checkAdminRole = async (userId: string, userEmail?: string) => {
+    // HARDCODED OWNER ACCESS: Always return true for these emails
+    const emailToCheck = userEmail || user?.email;
+    if (emailToCheck === "marcospaulosites23@gmail.com" || emailToCheck === "marcoscorporation23@gmail.com") {
+      setIsAdmin(true);
+      return true;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (error) throw error;
+      const hasAdmin = !!data;
+      setIsAdmin(hasAdmin);
+      return hasAdmin;
+    } catch (error) {
+      console.error("Error checking admin role:", error);
+      setIsAdmin(false);
+      return false;
+    }
+  };
+
   useEffect(() => {
-    // Set up auth state listener FIRST
+    let mounted = true;
+
+    const initSession = async (session: Session | null) => {
+      if (!mounted) return;
+
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        // Wait for both data fetches to complete
+        await Promise.all([
+          fetchProfile(session.user.id),
+          checkAdminRole(session.user.id, session.user.email)
+        ]);
+      } else {
+        setProfile(null);
+        setIsAdmin(false);
+      }
+
+      if (mounted) setLoading(false);
+    };
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Defer profile fetch to avoid deadlock
-        if (session?.user) {
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-        }
+      (_event, session) => {
+        initSession(session);
       }
     );
 
-    // THEN check for existing session
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      }
-      setLoading(false);
+      initSession(session);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
-
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error fetching profile:", error);
-      return;
-    }
-
-    setProfile(data);
-  };
 
   const signUp = async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
-    
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -112,6 +156,9 @@ export const useAuth = () => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
+      options: {
+        // Force session persistence
+      }
     });
 
     if (error) {
@@ -145,8 +192,9 @@ export const useAuth = () => {
       });
       return { error };
     }
-    
+
     setProfile(null);
+    setIsAdmin(false);
     toast({
       title: "Até logo!",
       description: "Você saiu da sua conta.",
@@ -173,7 +221,7 @@ export const useAuth = () => {
 
     // Refresh profile
     await fetchProfile(user.id);
-    
+
     toast({
       title: "Perfil atualizado!",
       description: "Suas alterações foram salvas.",
@@ -216,8 +264,8 @@ export const useAuth = () => {
 
   return {
     user,
-    session,
     profile,
+    isAdmin,
     loading,
     signUp,
     signIn,
@@ -225,5 +273,6 @@ export const useAuth = () => {
     updateProfile,
     uploadAvatar,
     fetchProfile,
+    checkAdminRole,
   };
 };

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, ChevronDown, LogOut, User, FolderPlus, FolderEdit, LayoutGrid } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Plus, ChevronDown, LogOut, User, FolderPlus, FolderEdit, LayoutGrid, Home, BookOpen, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,6 +29,12 @@ const RepositoryHeader = ({
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const mainNavItems = [
+    { title: "Início", icon: Home, href: "/" },
+    { title: "Como Utilizar", icon: BookOpen, href: "/how-to-use" },
+    { title: "Novidades", icon: Sparkles, href: "/whats-new" },
+  ];
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -46,7 +52,7 @@ const RepositoryHeader = ({
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
       <div className="flex items-center justify-between px-4 py-3">
-        {/* Left side - Admin management dropdown + Add Element button */}
+        {/* Left side - Admin management dropdown + Add Element button + Main Nav */}
         <div className="flex items-center gap-2">
           {isAdmin && (
             <>
@@ -98,13 +104,30 @@ const RepositoryHeader = ({
               {/* Add Element Button */}
               <Button
                 onClick={onAddElement}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 mr-4"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Elemento
               </Button>
             </>
           )}
+
+          {/* Main Navigation Items */}
+          <div className="flex items-center justify-center gap-1">
+            {mainNavItems.map((item) => (
+              <Button
+                key={item.title}
+                variant="ghost"
+                asChild
+                className="text-white hover:text-white hover:bg-white/10"
+              >
+                <Link to={item.href} className="flex items-center gap-2">
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                </Link>
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Right side - Profile and Logout buttons */}
@@ -112,20 +135,21 @@ const RepositoryHeader = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleProfile}
-            className="h-9 w-9 border border-border hover:bg-secondary"
-            title="Perfil"
-          >
-            <User className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
             onClick={handleLogout}
-            className="h-9 w-9 border border-border hover:bg-secondary hover:text-destructive"
+            className="h-9 w-9 border border-white/20 bg-gradient-to-b from-white/10 to-transparent hover:from-white/20 hover:text-destructive text-gray-300 shadow-sm transition-all duration-300"
             title="Sair"
           >
             <LogOut className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleProfile}
+            className="h-10 w-10 border border-white/20 rounded-full bg-gradient-to-b from-white/10 to-transparent hover:from-white/20 text-white shadow-md transition-all duration-300"
+            title="Perfil"
+          >
+            <User className="h-5 w-5" />
           </Button>
         </div>
       </div>

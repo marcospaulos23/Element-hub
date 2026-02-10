@@ -22,7 +22,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, loading, signIn, signUp } = useAuth();
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -48,7 +48,7 @@ const Auth = () => {
 
   const validateLogin = () => {
     const newErrors: Record<string, string> = {};
-    
+
     try {
       emailSchema.parse(loginEmail);
     } catch (e) {
@@ -71,7 +71,7 @@ const Auth = () => {
 
   const validateSignup = () => {
     const newErrors: Record<string, string> = {};
-    
+
     try {
       emailSchema.parse(signupEmail);
     } catch (e) {
@@ -105,11 +105,11 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateLogin()) return;
-    
+
     setIsSubmitting(true);
     const { error } = await signIn(loginEmail, loginPassword);
     setIsSubmitting(false);
-    
+
     if (!error) {
       navigate(returnTo);
     }
@@ -118,11 +118,11 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateSignup()) return;
-    
+
     setIsSubmitting(true);
     const { error } = await signUp(signupEmail, signupPassword, signupName || undefined);
     setIsSubmitting(false);
-    
+
     if (!error) {
       // Redirect to pending page after signup
       navigate("/access-pending");
@@ -140,8 +140,8 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -150,7 +150,7 @@ const Auth = () => {
 
         <Card className="border-border">
           <CardHeader className="text-center">
-            <CardTitle 
+            <CardTitle
               className="text-2xl font-bold tracking-wider"
               style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
@@ -166,7 +166,7 @@ const Auth = () => {
                 <TabsTrigger value="login">Entrar</TabsTrigger>
                 <TabsTrigger value="signup">Criar Conta</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
@@ -183,7 +183,7 @@ const Auth = () => {
                       <p className="text-sm text-destructive">{errors.loginEmail}</p>
                     )}
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Senha</Label>
                     <div className="relative">
@@ -220,7 +220,7 @@ const Auth = () => {
                   </Button>
                 </form>
               </TabsContent>
-              
+
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">
@@ -237,7 +237,7 @@ const Auth = () => {
                       <p className="text-sm text-destructive">{errors.signupName}</p>
                     )}
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
@@ -252,7 +252,7 @@ const Auth = () => {
                       <p className="text-sm text-destructive">{errors.signupEmail}</p>
                     )}
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Senha</Label>
                     <div className="relative">
